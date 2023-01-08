@@ -15,7 +15,6 @@ It also uses the [vorbin](https://pypi.org/project/vorbin/) package by Michele C
 therefore any paper using this should cite [Cappellari & Copin 2003](http://adsabs.harvard.edu/abs/2003MNRAS.342..345C).
 
 ## Usage example:
-see example_script.py.
 ```python
 import pygadmpa as pygad
 import voronoi_gadget as vg
