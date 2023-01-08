@@ -1,5 +1,5 @@
 # voronoi_gadget
-![Alt text](example_output.png.png?raw=true "Galaxy Kinematics example")
+![Alt text](example_output.png?raw=true "Galaxy Kinematics example")
 
 ## Description
 Creates mock integral field unit (IFU) galaxy images from galaxy simulations. 
