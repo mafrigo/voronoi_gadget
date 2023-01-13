@@ -189,7 +189,7 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
 
         # Actually plotting the colors
         img = display_bins(grid.xvor, grid.yvor, grid.binNum, plotquantity[:, i], vmin=cmaplimits[i][0],
-                           vmax=cmaplimits[i][1], cmap=cmap, **kwargs)
+                           vmax=cmaplimits[i][1], cmap=cmap, interpolation=cfg["interpolation"], **kwargs)
 
         ax = plt.gca()
         if cutatmag is None:
@@ -295,7 +295,7 @@ def deduce_cbar_limits(plotquantity, cmaplimits):
     return cmaplimits
 
 
-def display_bins(x, y, binNum, qtyBin, ax=None, cmap='Sauron', plotextent_fac=1., **kwargs):
+def display_bins(x, y, binNum, qtyBin, ax=None, cmap='Sauron', plotextent_fac=1., interpolation="none", **kwargs):
     """
     Adapted from vorbin (Michele Cappellari)
     """
@@ -330,7 +330,7 @@ def display_bins(x, y, binNum, qtyBin, ax=None, cmap='Sauron', plotextent_fac=1.
     mask[j, k] = 0
     img[j, k] = val
     img = np.ma.masked_array(img, mask)
-    img = ax.imshow(np.rot90(img), interpolation='none', cmap=cmap,
+    img = ax.imshow(img, interpolation=interpolation, cmap=cmap,
                     extent=[plotextent_fac * (xmin - pixelsize / 2), plotextent_fac * (xmax + pixelsize / 2),
                             plotextent_fac * (ymin - pixelsize / 2), plotextent_fac * (ymax + pixelsize / 2)],
                     **kwargs)

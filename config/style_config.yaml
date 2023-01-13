@@ -11,3 +11,4 @@ default:
   contourthickness: 0.8
   background_color: white
   text_color: black
+  interpolation: none
