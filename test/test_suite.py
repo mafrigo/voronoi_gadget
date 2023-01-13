@@ -42,9 +42,6 @@ class TestVoronoiTessellation(unittest.TestCase):
         snap = generate_snapshot(1000000)
         grid = VoronoiGrid(snap, 4., npixel_per_side=50, partperbin=test_ppb)
         average_ppb = np.mean(np.unique(grid._spaxelofpart, return_counts=True)[1])
-        #quantity = grid._snap["vel"][:,1]
-        #dist = quantity[grid._spaxelofpart == 3]
-        #np.savetxt("test_distribution.txt", dist)
         print("Target: " + str(test_ppb))
         print("Actual: " + str(average_ppb))
         self.assertGreaterEqual(average_ppb, 0.8*test_ppb)

@@ -424,23 +424,7 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
         titles2 = 2 * [" "]
 
     # Determining colorbar limits
-    for ipanel in np.arange(npanels):
-        if cmaplimits[ipanel] == 'deduce':
-            if np.min(plotquantity[:, ipanel]) * np.max(plotquantity[:, ipanel]) < 0.:
-                cmaplimits[ipanel] = 'symmetric'
-            else:
-                cmaplimits[ipanel] = 'minmax'
-
-        if cmaplimits[ipanel] in ['symmetric', 'minmax']:
-            pltqty = plotquantity[:, ipanel][
-                np.logical_and(plotquantity[:, ipanel] != -np.inf, plotquantity[:, ipanel] != np.inf)]
-        if cmaplimits[ipanel] == 'symmetric':
-            cmaplimits[ipanel] = [-np.max(abs(pltqty)), np.max(abs(pltqty))]
-        elif cmaplimits[ipanel] == 'minmax':
-            cmaplimits[ipanel] = [np.min(pltqty), np.max(pltqty)]
-        else:
-            pass
-    print("Colorbar limits: " + str(cmaplimits))
+    cmaplimits = deduce_cbar_limits(plotquantity, cmaplimits)
 
     for i in np.arange(npanels):
         # Determining titles and configuration
@@ -663,6 +647,26 @@ def _lambdar(grid, stats, weights=None, nbin=100, quiet=False, rmax=-1,
               " kpc:" + str(lambdaR[-1]))
     return lambdaR
 
+
+def deduce_cbar_limits(plotquantity, cmaplimits):
+    for ipanel in np.arange(len(cmaplimits)):
+        if cmaplimits[ipanel] == 'deduce':
+            if np.min(plotquantity[:, ipanel]) * np.max(plotquantity[:, ipanel]) < 0.:
+                cmaplimits[ipanel] = 'symmetric'
+            else:
+                cmaplimits[ipanel] = 'minmax'
+
+        if cmaplimits[ipanel] in ['symmetric', 'minmax']:
+            pltqty = plotquantity[:, ipanel][
+                np.logical_and(plotquantity[:, ipanel] != -np.inf, plotquantity[:, ipanel] != np.inf)]
+        if cmaplimits[ipanel] == 'symmetric':
+            cmaplimits[ipanel] = [-np.max(abs(pltqty)), np.max(abs(pltqty))]
+        elif cmaplimits[ipanel] == 'minmax':
+            cmaplimits[ipanel] = [np.min(pltqty), np.max(pltqty)]
+        else:
+            pass
+    print("Colorbar limits: " + str(cmaplimits))
+    return cmaplimits
 
 ################################################################################
 # Following routines are from the display_pixels package of Michele Cappellari, #
