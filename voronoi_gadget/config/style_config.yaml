@@ -1,6 +1,10 @@
 dark:
   background_color: darkslategrey
   text_color: white
+darkblurred:
+  background_color: darkslategrey
+  text_color: white
+  interpolation: bicubic
 default:
   labelsize: 17
   digitsize: 14
