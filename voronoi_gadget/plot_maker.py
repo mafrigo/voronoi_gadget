@@ -15,7 +15,7 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
                    titles=['Average', 'Dispersion', r'$h_3$', r'$h_4$'],
                    titles2=None, titles3=r"$\rm kpc$", cutatmag=None,
                    addlambdar=True, cutatrad=None, scalebar=None,
-                   savetxt=None, savefigure=True, plotfile='voronoimap',
+                   savetxt=None, savefigure=True, plotfile='voronoimap', style="default",
                    **kwargs):
     """
     Plots a Voronoi-binned image.
@@ -54,14 +54,14 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
                       the figure on the lower right corner of the first panel.
     cutatrad        : Same as cutatmag, but cutting at a given radius instead.
     scalebar        : If not None, adds a bar of the given length (in kpc)
-		      to the bottom left corner of the plot.
+                      to the bottom left corner of the plot.
     savetxt         : File on which to save data in text format. Doesn't do it if
-                    savetxt==None.
+                      savetxt==None.
     savefigure      : If True the final figure is saved in the current directory.
                       If False it is just shown.
     plotfile        : Name of the output file.
     """
-    cfg = get_style_config()
+    cfg = get_style_config(style)
 
     if titles3 is None:
         titles3 = r"$\rm kpc$"
@@ -97,11 +97,11 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
 
     print("Preparing plot")
     if figureconfig == 'horizontal':
-        plt.figure(figsize=(figsize * npanels, figsize))
+        fig = plt.figure(figsize=(figsize * npanels, figsize))
     if figureconfig == 'vertical':
-        plt.figure(figsize=(figsize, figsize * npanels))
+        fig = plt.figure(figsize=(figsize, figsize * npanels))
     if figureconfig == '22':
-        plt.figure(figsize=(2. * figsize, 2. * figsize))
+        fig = plt.figure(figsize=(2. * figsize, 2. * figsize))
 
     if cutatmag is not None:
         for i in np.arange(len(flux)):
@@ -114,9 +114,9 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
                 plotquantity[i] = None
 
     if cmap == 'viridis':
-        textcolor = 'w'  # for better visualization
+        inner_textcolor = 'w'  # for better visualization
     else:
-        textcolor = 'k'
+        inner_textcolor = 'k'
 
     if (xflux.any() is None and yflux.any() is None):  # added .any
         xflux, yflux = grid.xBar, grid.yBar
@@ -132,23 +132,24 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
             plt.subplot(int(100 + npanels * 10 + (i + 1)))
             plt.gca().tick_params(axis='x', labelbottom='off')
             if i == 0:
-                plt.ylabel(titles3, fontsize=cfg["textsize"])
+                plt.ylabel(titles3, fontsize=cfg["textsize"], color=cfg["text_color"])
             else:
                 plt.gca().tick_params(labelleft='off')  # left
+                plt.gca().axes.yaxis.set_ticklabels([])
         if figureconfig == 'vertical':
             plt.subplot(int(npanels * 100 + 10 + (i + 1)))
-            plt.ylabel(titles2[i], fontsize=cfg["textsize"], labelpad=-20)
+            plt.ylabel(titles2[i], fontsize=cfg["textsize"], labelpad=-20, color=cfg["text_color"])
             if i == npanels - 1:
-                plt.xlabel(titles3, fontsize=cfg["textsize"])
+                plt.xlabel(titles3, fontsize=cfg["textsize"], color=cfg["text_color"])
         if figureconfig == '22':
             plt.subplot(220 + (i + 1))
             if titles2 == [" ", " ", " ", " "]:
                 if i == 0 or i == 2:
-                    plt.ylabel(r"$\rm kpc$", fontsize=cfg["textsize"], labelpad=-20)
+                    plt.ylabel(r"$\rm kpc$", fontsize=cfg["textsize"], labelpad=-20, color=cfg["text_color"])
             else:
-                plt.ylabel(titles2[i], fontsize=cfg["textsize"], labelpad=-20)
+                plt.ylabel(titles2[i], fontsize=cfg["textsize"], labelpad=-20, color=cfg["text_color"])
             if i == npanels - 1 or i == npanels - 2:
-                plt.xlabel(titles3, fontsize=cfg["textsize"])
+                plt.xlabel(titles3, fontsize=cfg["textsize"], color=cfg["text_color"])
         if i == 0:
             minx = -0.5 * grid.extent  # np.min(xvor)
             miny = -0.5 * grid.extent  # np.min(yvor)
@@ -157,12 +158,12 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
             # Custom titles in left side of first panel
             if len(titles2) > 0:  # above and below
                 plt.text(minx + 0.03 * xlength, miny + 0.03 * ylength, titles2[0], fontsize=cfg["labelsize"],
-                         color=textcolor)
+                         color=inner_textcolor)
                 plt.text(minx + 0.03 * xlength, miny + 0.89 * ylength, titles2[1], fontsize=cfg["labelsize"],
-                         color=textcolor)
+                         color=inner_textcolor)
             else:  # just below
                 plt.text(minx + 0.03 * xlength, miny + 0.03 * ylength, titles2, fontsize=cfg["labelsize"],
-                         color=textcolor)
+                         color=inner_textcolor)
 
             if scalebar is not None:  # scale bar on the left axis
                 # plt.axhline(y=np.min(yvor)+0.89*ylength, linewidth=2, color='k',
@@ -184,7 +185,7 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
                 print("Effective radius: " + str(reff))
                 lambdaR = _lambdar(grid, plotquantity, rmax=reff)[-1]
                 plt.text(minx + 0.6 * xlength, miny + 0.03 * ylength, r"$\lambda_R = %.2f$" % (lambdaR),
-                         fontsize=cfg["labelsize"], color=textcolor)
+                         fontsize=cfg["labelsize"], color=inner_textcolor)
 
         # Actually plotting the colors
         img = display_bins(grid.xvor, grid.yvor, grid.binNum, plotquantity[:, i], vmin=cmaplimits[i][0],
@@ -193,7 +194,7 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
         ax = plt.gca()
         if cutatmag is None:
             # Plotting titles
-            plt.title(titles[i], fontsize=cfg["titlesize"], y=1.04)
+            plt.title(titles[i], fontsize=cfg["titlesize"], y=1.04, color=cfg["text_color"])
 
             # Flux contours
             if fluxcontours is not None:
@@ -207,7 +208,7 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
                     print(xflux, yflux, flux)
 
             # Adjusting axes ticks
-            ax.tick_params(labelsize=cfg["digitsize"])
+            ax.tick_params(labelsize=cfg["digitsize"], labelcolor=cfg["text_color"])
             ax.tick_params(direction="in", which='both')
             # locs= ax.get_yticks()
             locs = np.round(np.linspace(-0.5 * grid.extent, 0.5 * grid.extent, cfg["naxeslabels"]), 2)
@@ -221,7 +222,7 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
             cax = divider.append_axes("right", size="5%", pad=0.05)
             if cfg["ncbarlabels"] is None:
                 cb = plt.colorbar(img, cax=cax)
-                cb.ax.tick_params(labelsize=cfg["digitsize"])
+                cb.ax.tick_params(labelsize=cfg["digitsize"], labelcolor=cfg["text_color"])
             else:  # Calculating optimal colormap tick distribution
                 cspan = (cmaplimits[i][1] - cmaplimits[i][0]) / (cfg["ncbarlabels"] - 1)
                 # cspan: separation between colorbar ticks/labels
@@ -248,9 +249,10 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
                         cticks.append(lowerlimit + cspan * (itick))
                 print("Colorbar ticks (" + str(i) + "): " + str(cticks))
                 cb = plt.colorbar(img, cax=cax, ticks=cticks)
-                cb.ax.tick_params(labelsize=cfg["digitsize"] * 1.1)
+                cb.ax.tick_params(labelsize=cfg["digitsize"] * 1.1, labelcolor=cfg["text_color"])
 
         plt.subplots_adjust(wspace=0.3)
+        fig.patch.set_facecolor(cfg["background_color"])
 
     if savefigure:
         if cutatmag is not None:  # Figure cut at a given isophote, without axes

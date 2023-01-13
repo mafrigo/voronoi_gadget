@@ -11,7 +11,7 @@ from voronoi_gadget.plot_maker import makevoronoimap
 def voronoimap(snap, qty='vel', grid=None, extent=20, npixel_per_side=200, partperbin=None, nspaxels=500,
                weightqty='mass', sigmapp=-1., npseudoparticles=60, qty_spread=0., force_orient=True, ensure_rotdir=True,
                scalebar=None, cutatmag=None, figureconfig='horizontal', info=None, plotfile=None, savetxt=None,
-               savefigure=True, custom_titles=None):
+               savefigure=True, custom_titles=None, style='default'):
     """
     Plots a quantity using a Voronoi-binned grid, calculated so that each cell 
     contains approximately the same mass/light. The 4 default panels show average,
@@ -50,6 +50,7 @@ def voronoimap(snap, qty='vel', grid=None, extent=20, npixel_per_side=200, partp
                       savetxt=None.
     savefigure      : Whether to save the final figure.
     plotfile        : Name of the final plot file. Standard is qty+str(npanels)+'map' (e.g. "vel4map.png").
+    style           : Plot style, as defined in config/style_config.yaml.
     """
     # Loading default parameters
     def_titles, cmap, cmaplimits, statsmode, addlambdar, centeriszero = get_plot_config(qty)
@@ -82,6 +83,6 @@ def voronoimap(snap, qty='vel', grid=None, extent=20, npixel_per_side=200, partp
     # Make plot
     makevoronoimap(plotquantity, grid, npanels=npanels, fluxqty=weightqty, figureconfig=figureconfig, cmap=cmap,
                    cmaplimits=cmaplimits, titles=titles, titles2=info, plotfile=plotfile, savefigure=savefigure,
-                   cutatmag=cutatmag, addlambdar=addlambdar, savetxt=savetxt, scalebar=scalebar)
+                   cutatmag=cutatmag, addlambdar=addlambdar, savetxt=savetxt, scalebar=scalebar, style=style)
     if savefigure:
         plt.close()

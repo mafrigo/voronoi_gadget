@@ -1,3 +1,6 @@
+dark:
+  background_color: darkslategrey
+  text_color: white
 default:
   labelsize: 17
   digitsize: 14
@@ -6,3 +9,5 @@ default:
   naxeslabels: 5
   ncbarlabels: 5
   contourthickness: 0.8
+  background_color: white
+  text_color: black
