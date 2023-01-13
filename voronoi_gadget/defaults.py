@@ -7,8 +7,16 @@ def get_style_config(style='default'):
     from pathlib import Path
     config_path = Path(__file__).parent / "../style_config.yaml"
     with open(config_path, "r") as ymlfile:
-        cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
-    return cfg[style]
+        content = yaml.load(ymlfile, Loader=yaml.FullLoader)
+        cfg = dict()
+        default_cfg = content["default"]
+        new_cfg = content[style]
+        for key in default_cfg.keys():
+            if key in new_cfg:
+                cfg[key] = new_cfg[key]
+            else:
+                cfg[key] = default_cfg[key]
+    return cfg
 
 
 def getdefaultplotparams(qty, statsmode=None, select=False, npanels=4):
