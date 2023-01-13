@@ -8,7 +8,7 @@ setup(
     install_requires=[
         "numpy",
         "scipy",
-        "matplotlib",
+        "matplotlib>=3.6.3",
         "pyyaml",
         "vorbin"
     ],
