@@ -12,5 +12,7 @@ setup(
         "pyyaml",
         # "pathlib",
         "vorbin"
-    ]
+    ],
+    package_data={'voronoi_gadget': ['voronoi_gadget/config/*.yaml']},
+    include_package_data=True,
 )
