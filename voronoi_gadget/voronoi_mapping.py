@@ -516,13 +516,12 @@ def deduce_cbar_limits(plotquantity, cmaplimits):
     return cmaplimits
 
 
-def display_bins(x, y, binNum, qtyBin, ax=None, cmap='Sauron', **kwargs):
+def display_bins(x, y, binNum, qtyBin, ax=None, cmap='Sauron', plotextent_fac = 1., **kwargs):
     """
     Adapted from vorbin (Michele Cappellari)
     """
     from scipy.spatial import distance
 
-    plotextent = 1.
     if ax is None:
         ax = plt.gca()
     if cmap == 'sauron':
@@ -553,10 +552,10 @@ def display_bins(x, y, binNum, qtyBin, ax=None, cmap='Sauron', **kwargs):
     img[j, k] = val
     img = np.ma.masked_array(img, mask)
     img = ax.imshow(np.rot90(img), interpolation='none', cmap=cmap,
-                    extent=[plotextent * (xmin - pixelsize / 2),
-                            plotextent * (xmax + pixelsize / 2),
-                            plotextent * (ymin - pixelsize / 2),
-                            plotextent * (ymax + pixelsize / 2)],
+                    extent=[plotextent_fac * (xmin - pixelsize / 2),
+                            plotextent_fac * (xmax + pixelsize / 2),
+                            plotextent_fac * (ymin - pixelsize / 2),
+                            plotextent_fac * (ymax + pixelsize / 2)],
                     **kwargs)
     ax.minorticks_on()
     ax.tick_params(length=10, width=1, which='major')
