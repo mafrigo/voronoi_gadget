@@ -10,7 +10,6 @@ setup(
         "scipy",
         "matplotlib",
         "pyyaml",
-        # "pathlib",
         "vorbin"
     ],
     package_data={'voronoi_gadget': ['voronoi_gadget/config/*.yaml']},
