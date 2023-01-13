@@ -20,7 +20,7 @@ class TestSnapshot(unittest.TestCase):
         n_pseudo_particles = 5
         test_snap_len_pp = 100
         snap_pp = generate_snapshot(test_snap_len_pp)
-        pseudosnap = PseudoSnap(snap_pp, n_pseudo_particles, 0.5)
+        pseudosnap = PseudoSnap(snap_pp, n_pseudo_particles, 0.5, 1.)
         self.assertEqual(len(pseudosnap["mass"]), test_snap_len_pp*n_pseudo_particles)
         self.assertEqual(len(pseudosnap["ID"]), test_snap_len_pp*n_pseudo_particles)
         self.assertEqual(pseudosnap["pos"].shape, (test_snap_len_pp*n_pseudo_particles, 3))

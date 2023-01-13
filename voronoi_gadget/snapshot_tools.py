@@ -93,9 +93,10 @@ class PseudoSnap(object):
     pseudoparticles.
     """
 
-    def __init__(self, snap, npseudoparticles, sigmapp):
+    def __init__(self, snap, npseudoparticles, sigmapp, qty_spread):
         self.sigma = sigmapp
         self.npp = npseudoparticles
+        self.qty_spread = qty_spread
         self.snap = snap
         self._descriptor = "pseudosnap"
 
@@ -124,7 +125,7 @@ class PseudoSnap(object):
     def get_snap(self):
         return self.snap
 
-    def get_property(self, qtylabel, sigmaqty=-1):
+    def get_property(self, qtylabel):
         """
         Calculates a snapshot property for the pseudosnapshot and returns it.
 
@@ -135,12 +136,12 @@ class PseudoSnap(object):
         """
         # ids=self._ids
         qty = self.snap[qtylabel]
-        qtyg = self._expandqty(qty, qtylabel=qtylabel, sigmaqty=sigmaqty)
+        qtyg = self._expandqty(qty, qtylabel=qtylabel, sigmaqty=self.qty_spread)
         return qtyg
 
-    def get(self, expr, units=None, namespace=None, sigmaqty=-1):
+    def get(self, expr, units=None, namespace=None):
         qty = self.snap.get(expr, units=units, namespace=namespace)
-        qtyg = self._expandqty(qty, qtylabel=expr, sigmaqty=sigmaqty)
+        qtyg = self._expandqty(qty, qtylabel=expr, sigmaqty=self.qty_spread)
         return qtyg
 
     def __getitem__(self, key):

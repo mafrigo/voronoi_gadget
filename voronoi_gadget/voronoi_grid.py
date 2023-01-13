@@ -114,10 +114,7 @@ class VoronoiGrid(object):
                 if len(qtybin) < 3:
                     print("Few particles in voronoi bin ( " + str(len(qtybin)) + " )")
                 if mode in ["sample", "biweight", "fit", "likelihood"]:
-                    stats[bn][:4] = gauss_hermite_fit(qtybin, weights=weightsbin, mode=mode,
-                                                      artificial_error=artificial_error, meas_error=measerror)
-                if mode == '2gauss':
-                    stats[bn] = double_gaussian_fit(qtybin, weights=weightsbin, artificial_error=artificial_error)
+                    stats[bn][:4] = gauss_hermite_fit(qtybin, weights=weightsbin, mode=mode)
             if not quiet:
                 print(stats[bn])
 
@@ -129,9 +126,10 @@ class VoronoiGrid(object):
 def _makegrid(posx, posy, weights, extent, voronoibinning=True,
               npixel_per_side=200, partperbin=None, nvoronoibins=500):
     import scipy.stats as stats
+    from vorbin.voronoi_2d_binning import voronoi_2d_binning
+
     print("Binning particles on regular grid... ")
-    nimg, xedges, yedges, pixelofpart0 = stats.binned_statistic_2d(x=posx,
-                                                                   y=posy, values=weights, statistic='sum',
+    nimg, xedges, yedges, pixelofpart0 = stats.binned_statistic_2d(x=posx, y=posy, values=weights, statistic='sum',
                                                                    bins=npixel_per_side,
                                                                    range=[[-extent / 2., extent / 2.],
                                                                           [-extent / 2., extent / 2.]])
@@ -142,33 +140,28 @@ def _makegrid(posx, posy, weights, extent, voronoibinning=True,
     xvor = xvor.reshape((npixel_per_side ** 2))
     yvor = yvor.reshape((npixel_per_side ** 2))
 
-    if voronoibinning:
-        from vorbin.voronoi_2d_binning import voronoi_2d_binning
-        print("Preparing voronoi binning...")
-        if partperbin is None:
-            partperbin = np.sum(nimg) / nvoronoibins
-        else:
-            partperbin *= 0.7  # 0.7 is an empirical factor to get the right output partperbin
-        if partperbin > np.sum(nimg):
-            print("Warning: too few particles for the selected value " + \
-                  "of partperbin; making only one spaxel")
-            binNum = np.full(np.shape(xvor), 0).astype(int)
-            xBar = np.array([0.])
-            yBar = np.array([0.])
-        else:
-            # (Poissonian) signal-to-noise used to determine the Voronoi grid
-            signal_to_noise = np.sqrt(nimg.reshape(npixel_per_side ** 2))
-            targetSN = np.sqrt(partperbin)  # target signal-to-noise of every bin
-
-            print("Voronoi binning...")
-            binNum, xNode, yNode, xBar, yBar, sn, nvorpixels, scale = \
-                voronoi_2d_binning(xvor, yvor, signal_to_noise,
-                                   np.full(np.shape(signal_to_noise), 1.),
-                                   targetSN, pixelsize=pixelsize, plot=False, quiet=True)
+    print("Preparing voronoi binning...")
+    if partperbin is None:
+        partperbin = np.sum(nimg) / nvoronoibins
     else:
-        binNum = np.arange(len(xvor))
-        xBar = xvor
-        yBar = yvor
+        partperbin *= 0.7  # 0.7 is an empirical factor to get the right output partperbin
+    if partperbin > np.sum(nimg):
+        print("Warning: too few particles for the selected value " + \
+              "of partperbin; making only one spaxel")
+        binNum = np.full(np.shape(xvor), 0).astype(int)
+        xBar = np.array([0.])
+        yBar = np.array([0.])
+    else:
+        # (Poissonian) signal-to-noise used to determine the Voronoi grid
+        signal_to_noise = np.sqrt(nimg.reshape(npixel_per_side ** 2))
+        targetSN = np.sqrt(partperbin)  # target signal-to-noise of every bin
+
+        print("Voronoi binning...")
+        binNum, xNode, yNode, xBar, yBar, sn, nvorpixels, scale = \
+            voronoi_2d_binning(xvor, yvor, signal_to_noise,
+                               np.full(np.shape(signal_to_noise), 1.),
+                               targetSN, pixelsize=pixelsize, plot=False, quiet=True)
+
     yind, xind = np.unravel_index(pixelofpart0, (len(xedges) + 1, len(yedges) + 1))
     gridcondition = (xind > 0) * (xind < npixel_per_side + 1) * (yind > 0) * \
                     (yind < npixel_per_side + 1)
