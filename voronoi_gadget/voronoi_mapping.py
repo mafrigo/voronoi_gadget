@@ -5,21 +5,11 @@ import matplotlib.pyplot as plt
 import mpl_toolkits.axes_grid1 as mplax
 import scipy
 import pygad
-from matplotlib import colors
 from voronoi_gadget.snapshot_tools import *
 from voronoi_gadget.voronoi_grid import *
 from voronoi_gadget.sauron_cmap import *
 from voronoi_gadget.lambdar import _lambdar
-from voronoi_gadget.defaults import getdefaultplotparams
-
-# Style parameters for the standard Voronoi plot
-labelsize = 17  # 20
-digitsize = 14  # 18
-textsize = 23  # 27
-titlesize = 25  # 30
-naxeslabels = 5
-ncbarlabels = 5
-contourthickness = 0.8
+from voronoi_gadget.defaults import getdefaultplotparams, get_style_config
 
 
 def voronoimap(snap, qty='vel', npanels=4, extent=20,
@@ -163,7 +153,7 @@ def voronoimap(snap, qty='vel', npanels=4, extent=20,
                        figureconfig=figureconfig, cmap=cmap, cmaplimits=cmaplimits,
                        titles=titles, titles2=info, plotfile=plotfile,
                        savefigure=savefigure, cutatmag=cutatmag,
-                       addlambdar=addlambdar, ncbarlabels=ncbarlabels,
+                       addlambdar=addlambdar,
                        savetxt=savetxt, scalebar=scalebar)
 
     else:  # for voronoimaps separated by age/Z
@@ -210,7 +200,7 @@ def voronoimap(snap, qty='vel', npanels=4, extent=20,
                                cmap=cmap, cmaplimits=cmaplimits, titles=titles,
                                titles2=info, plotfile=plotfile + str(i),
                                savefigure=savefigure, cutatmag=cutatmag,
-                               addlambdar=addlambdar, ncbarlabels=ncbarlabels,
+                               addlambdar=addlambdar,
                                savetxt=savetxt, scalebar=scalebar)
     if savefigure:
         plt.close()
@@ -219,7 +209,7 @@ def voronoimap(snap, qty='vel', npanels=4, extent=20,
 def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
                    fluxqty='mass', cmap='sauron',
                    cmaplimits=["deduce", "minmax", "symmetric", "symmetric"],
-                   figsize=5, figureconfig='horizontal', ncbarlabels=5,
+                   figsize=5, figureconfig='horizontal',
                    titles=['Average', 'Dispersion', r'$h_3$', r'$h_4$'],
                    titles2=None, titles3=r"$\rm kpc$", cutatmag=None,
                    addlambdar=True, cutatrad=None, scalebar=None,
@@ -252,8 +242,6 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
     figsize         : Height (width) of the figure when figureconfig=='horizontal' 
                       (=='vertical').
     figureconfig    : Orientation of the final figure; 'horizontal', 'vertical' or '22'.
-    ncbarlabels     : Number of colorbar labels. The code will automatically calculate 
-                      the best ncbarlabels labels for the plot.
     titles          : Titles of the 4 plots.
     titles2         : x/y labels of the plots (for figureconfig=horizontal/vertical). 
                       Can be used to display additional info.
@@ -271,6 +259,7 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
                       If False it is just shown.
     plotfile        : Name of the output file.
     """
+    cfg = get_style_config()
 
     if titles3 is None:
         titles3 = r"$\rm kpc$"
@@ -341,23 +330,23 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
             plt.subplot(int(100 + npanels * 10 + (i + 1)))
             plt.gca().tick_params(axis='x', labelbottom='off')
             if i == 0:
-                plt.ylabel(titles3, fontsize=textsize)
+                plt.ylabel(titles3, fontsize=cfg["textsize"])
             else:
                 plt.gca().tick_params(labelleft='off')  # left
         if figureconfig == 'vertical':
             plt.subplot(int(npanels * 100 + 10 + (i + 1)))
-            plt.ylabel(titles2[i], fontsize=textsize, labelpad=-20)
+            plt.ylabel(titles2[i], fontsize=cfg["textsize"], labelpad=-20)
             if i == npanels - 1:
-                plt.xlabel(titles3, fontsize=textsize)
+                plt.xlabel(titles3, fontsize=cfg["textsize"])
         if figureconfig == '22':
             plt.subplot(220 + (i + 1))
             if titles2 == [" ", " ", " ", " "]:
                 if i == 0 or i == 2:
-                    plt.ylabel(r"$\rm kpc$", fontsize=textsize, labelpad=-20)
+                    plt.ylabel(r"$\rm kpc$", fontsize=cfg["textsize"], labelpad=-20)
             else:
-                plt.ylabel(titles2[i], fontsize=textsize, labelpad=-20)
+                plt.ylabel(titles2[i], fontsize=cfg["textsize"], labelpad=-20)
             if i == npanels - 1 or i == npanels - 2:
-                plt.xlabel(titles3, fontsize=textsize)
+                plt.xlabel(titles3, fontsize=cfg["textsize"])
         if i == 0:
             minx = -0.5 * grid.extent  # np.min(xvor)
             miny = -0.5 * grid.extent  # np.min(yvor)
@@ -365,10 +354,10 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
             ylength = grid.extent  # np.max(yvor)-np.min(yvor)
             # Custom titles in left side of first panel
             if len(titles2) > 0:  # above and below
-                plt.text(minx + 0.03 * xlength, miny + 0.03 * ylength, titles2[0], fontsize=labelsize, color=textcolor)
-                plt.text(minx + 0.03 * xlength, miny + 0.89 * ylength, titles2[1], fontsize=labelsize, color=textcolor)
+                plt.text(minx + 0.03 * xlength, miny + 0.03 * ylength, titles2[0], fontsize=cfg["labelsize"], color=textcolor)
+                plt.text(minx + 0.03 * xlength, miny + 0.89 * ylength, titles2[1], fontsize=cfg["labelsize"], color=textcolor)
             else:  # just below
-                plt.text(minx + 0.03 * xlength, miny + 0.03 * ylength, titles2, fontsize=labelsize, color=textcolor)
+                plt.text(minx + 0.03 * xlength, miny + 0.03 * ylength, titles2, fontsize=cfg["labelsize"], color=textcolor)
 
             if scalebar is not None:  # scale bar on the left axis
                 # plt.axhline(y=np.min(yvor)+0.89*ylength, linewidth=2, color='k',
@@ -390,7 +379,7 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
                 print("Effective radius: " + str(reff))
                 lambdaR = _lambdar(grid, plotquantity, rmax=reff)[-1]
                 plt.text(minx + 0.6 * xlength, miny + 0.03 * ylength, r"$\lambda_R = %.2f$" % (lambdaR),
-                         fontsize=labelsize, color=textcolor)
+                         fontsize=cfg["labelsize"], color=textcolor)
 
         # Actually plotting the colors
         img = display_bins(grid.xvor, grid.yvor, grid.binNum, plotquantity[:, i], vmin=cmaplimits[i][0],
@@ -399,7 +388,7 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
         ax = plt.gca()
         if cutatmag is None:
             # Plotting titles
-            plt.title(titles[i], fontsize=titlesize, y=1.04)
+            plt.title(titles[i], fontsize=cfg["titlesize"], y=1.04)
 
             # Flux contours
             if fluxcontours is not None:
@@ -407,16 +396,16 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
                     mag = -2.5 * np.log10(flux / np.max(flux).ravel())
                     plt.tricontour(xflux, yflux, mag,
                                    levels=np.arange(5), colors='k',  # 20
-                                   linewidths=contourthickness)
+                                   linewidths=cfg["contourthickness"])
                 except:
                     print("Warning: Impossible to print contours; problem with the data")
                     print(xflux, yflux, flux)
 
             # Adjusting axes ticks
-            ax.tick_params(labelsize=digitsize)
+            ax.tick_params(labelsize=cfg["digitsize"])
             ax.tick_params(direction="in", which='both')
             # locs= ax.get_yticks()
-            locs = np.round(np.linspace(-0.5 * grid.extent, 0.5 * grid.extent, naxeslabels), 2)
+            locs = np.round(np.linspace(-0.5 * grid.extent, 0.5 * grid.extent, cfg["naxeslabels"]), 2)
             ax.xaxis.set_ticks(locs)
             ax.yaxis.set_ticks(locs)
             plt.xlim([-0.5 * grid.extent, 0.5 * grid.extent])
@@ -425,11 +414,11 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
             # Determining and plotting colorbar ticks
             divider = mplax.make_axes_locatable(ax)
             cax = divider.append_axes("right", size="5%", pad=0.05)
-            if ncbarlabels is None:
+            if cfg["ncbarlabels"] is None:
                 cb = plt.colorbar(img, cax=cax)
-                cb.ax.tick_params(labelsize=digitsize)
+                cb.ax.tick_params(labelsize=cfg["digitsize"])
             else:  # Calculating optimal colormap tick distribution
-                cspan = (cmaplimits[i][1] - cmaplimits[i][0]) / (ncbarlabels - 1)
+                cspan = (cmaplimits[i][1] - cmaplimits[i][0]) / (cfg["ncbarlabels"] - 1)
                 # cspan: separation between colorbar ticks/labels
                 cspanorder = int(np.round(np.log10(cspan)))
                 # recalculating cspan in case lower limit needs to be truncated
@@ -439,22 +428,22 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
                     # limitorder=int(np.floor(np.log10(abs(cmaplimits[i][0]))))
                     limitorder = int(np.floor(np.log10(abs(cmaplimits[i][1]))))
                     lowerlimit = (10. ** (limitorder - 1)) * np.ceil(cmaplimits[i][0] / (10. ** (limitorder - 1)))
-                    cspan = (cmaplimits[i][1] - lowerlimit) / (ncbarlabels - 1)
+                    cspan = (cmaplimits[i][1] - lowerlimit) / (cfg["ncbarlabels"] - 1)
                     # truncating cspan to avoid lots of decimals
                 cspan = (10. ** (cspanorder - 1)) * np.trunc(cspan / (10. ** (cspanorder - 1)))
                 if cspanorder > 0:
                     cspan = int(cspan)
                 if cmaplimits[i][1] == -cmaplimits[i][0]:
                     cticks = []
-                    for itick in np.arange(ncbarlabels):
-                        cticks.append(cspan * (itick - ((ncbarlabels - 1) / 2.)))
+                    for itick in np.arange(cfg["ncbarlabels"]):
+                        cticks.append(cspan * (itick - ((cfg["ncbarlabels"] - 1) / 2.)))
                 else:
                     cticks = []
-                    for itick in np.arange(ncbarlabels):
+                    for itick in np.arange(cfg["ncbarlabels"]):
                         cticks.append(lowerlimit + cspan * (itick))
                 print("Colorbar ticks (" + str(i) + "): " + str(cticks))
                 cb = plt.colorbar(img, cax=cax, ticks=cticks)
-                cb.ax.tick_params(labelsize=digitsize * 1.1)
+                cb.ax.tick_params(labelsize=cfg["digitsize"] * 1.1)
 
         plt.subplots_adjust(wspace=0.3)
 

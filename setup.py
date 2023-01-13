@@ -9,6 +9,8 @@ setup(
         "numpy",
         "scipy",
         "matplotlib",
+        "yaml",
+        "pathlib",
         "vorbin"
     ]
 )

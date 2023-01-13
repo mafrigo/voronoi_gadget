@@ -1,0 +1,8 @@
+default:
+  labelsize: 17
+  digitsize: 14
+  textsize: 23
+  titlesize: 25
+  naxeslabels: 5
+  ncbarlabels: 5
+  contourthickness: 0.8

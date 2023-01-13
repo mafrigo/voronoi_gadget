@@ -1,3 +1,16 @@
+def get_style_config(style='default'):
+    """
+    Read style_config.yaml
+    """
+
+    import yaml
+    from pathlib import Path
+    config_path = Path(__file__).parent / "../style_config.yaml"
+    with open(config_path, "r") as ymlfile:
+        cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
+    return cfg[style]
+
+
 def getdefaultplotparams(qty, statsmode=None, select=False, npanels=4):
     """
     For a given quantity, returns default subplot titles, colormap, FF
