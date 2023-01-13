@@ -17,14 +17,14 @@ class TestSnapshot(unittest.TestCase):
         self.assertEqual(snap["vel"].shape, (test_snap_len, 3))
 
     def test_pseudo_snap(self):
-        test_snap_len = 100
         n_pseudo_particles = 5
-        snap = generate_snapshot(test_snap_len)
-        pseudosnap = PseudoSnap(snap, n_pseudo_particles, 0.5)
-        self.assertEqual(len(pseudosnap["mass"]), test_snap_len*n_pseudo_particles)
-        self.assertEqual(len(pseudosnap["ID"]), test_snap_len*n_pseudo_particles)
-        self.assertEqual(pseudosnap["pos"].shape, (test_snap_len*n_pseudo_particles, 3))
-        self.assertEqual(pseudosnap["vel"].shape, (test_snap_len*n_pseudo_particles, 3))
+        test_snap_len_pp = 100
+        snap_pp = generate_snapshot(test_snap_len_pp)
+        pseudosnap = PseudoSnap(snap_pp, n_pseudo_particles, 0.5)
+        self.assertEqual(len(pseudosnap["mass"]), test_snap_len_pp*n_pseudo_particles)
+        self.assertEqual(len(pseudosnap["ID"]), test_snap_len_pp*n_pseudo_particles)
+        self.assertEqual(pseudosnap["pos"].shape, (test_snap_len_pp*n_pseudo_particles, 3))
+        self.assertEqual(pseudosnap["vel"].shape, (test_snap_len_pp*n_pseudo_particles, 3))
 
 
 class TestVoronoiTessellation(unittest.TestCase):
@@ -42,6 +42,9 @@ class TestVoronoiTessellation(unittest.TestCase):
         snap = generate_snapshot(1000000)
         grid = VoronoiGrid(snap, 4., npixel_per_side=50, partperbin=test_ppb)
         average_ppb = np.mean(np.unique(grid._spaxelofpart, return_counts=True)[1])
+        #quantity = grid._snap["vel"][:,1]
+        #dist = quantity[grid._spaxelofpart == 3]
+        #np.savetxt("test_distribution.txt", dist)
         print("Target: " + str(test_ppb))
         print("Actual: " + str(average_ppb))
         self.assertGreaterEqual(average_ppb, 0.8*test_ppb)
@@ -50,7 +53,14 @@ class TestVoronoiTessellation(unittest.TestCase):
 
 class TestStatistics(unittest.TestCase):
     def test_stats(self):
-        self.assertEqual(1., 1.)
+        test_data = np.loadtxt("sample_data/test_distribution.txt")
+        stats = gauss_hermite_fit(test_data)
+        exp_stats = -108., 428., 0.0255, 0.017
+        print("Target: ", exp_stats)
+        print("Actual: ", stats)
+        for i in [0,1,2,3]:
+            self.assertTrue(abs(0.9*exp_stats[i]) <= abs(stats[i]) <= abs(1.1*exp_stats[i]))
+            self.assertEqual(np.sign(stats[i]), np.sign(exp_stats[i]))
 
 
 class TestMapping(unittest.TestCase):
