@@ -12,10 +12,10 @@ from voronoi_gadget.lambdar import _lambdar
 from voronoi_gadget.defaults import getdefaultplotparams, get_style_config
 
 
-def voronoimap(snap, qty='vel', npanels=4, extent=20,
+def voronoimap(snap, qty='vel', extent=20,
                npixel_per_side=200, partperbin=None, nspaxels=500,
-               statsmode='default', weightqty='mass', selectqty=None,
-               selectbounds=None, sigmapp=-1., npseudoparticles=60,
+               statsmode='default', weightqty='mass',
+               sigmapp=-1., npseudoparticles=60,
                force_orient=True, ensure_rotdir=True,
                artificial_error=0., measerror=0., scalebar=None,
                cutatmag=None, figureconfig='horizontal',
@@ -37,12 +37,8 @@ def voronoimap(snap, qty='vel', npanels=4, extent=20,
                       -'age' (Age in Gyr).
                       -'logage' (Age in Gyr (logarithmic)).
                       -'lambdar' lambda_R parameter for every spaxel(1st panel only).
-    npanels         : Number of panels/moments to be displayed. With npanels=1 only 
-                      the average is shown, with npanels=2 average and dispersion, 
-                      and with npanels=4 average, dispersion, h3, and h4.
     extent          : Extent of the final image, in kpc; for instance, extent=20 
                       means from -10 kpc to 10 kpc.
-    subsnap         : Which subsnap to pick (e.g. 'stars' or 'gas')
     npixel_per_side : npixel_per_side**2 is the number of regular pixels which form 
                       the base grid. The voronoi spaxels are constructed by 
                       associating these.
@@ -50,17 +46,8 @@ def voronoimap(snap, qty='vel', npanels=4, extent=20,
                       nspaxels spaxels are generated.
     nspaxels        : If partperbin is None, number of voronoi spaxels to be 
                       generated, otherwise it is unused. If nspaxels==0, no Voronoi 
-                      binning is performed and a regular 2D grid is used instead. 
-    statsmode       : Method for calculating average and dispersion, h3 and h4 in 
-                      each spaxel, as used by gauss_hermite_fit(). 'default' means 
-                      'sample' for most quantities and 'fit' for velocity.
+                      binning is performed and a regular 2D grid is used instead.
     weightqty       : Quantity over which the evaluation of "qty" is weighted.
-    selectqty       : Quantity to be used for slicing the snapshot in different 
-                      parts. Can be 'age', 'Z', 'vel', or None. If None, plots all 
-                      particles together (no slicing).
-    selectbounds    : Boundaries for the various slices. Example: 
-                      selectbounds=[0,7,13] produces 2 slices, 0<selectqty<7 and 
-                      7<selectqty<13.
     sigmapp         : If positive, each particle is expanded into a cloud of 
                       pseudo-particles distributed according to a 3D gaussian with 
                       sigma sigmapp. If negative, no such expansion is performed.
@@ -78,16 +65,10 @@ def voronoimap(snap, qty='vel', npanels=4, extent=20,
 		              scale of the figure. If scalebar=='reff', the effective radius
                       of the given subsnap will be used.
     cutatmag        : Instead of making the normal voronoiplot, cuts the figure at 
-                      the given magnitude and saves it without axes. 
-    addlambdar      : Whether to calculate and display the lambda_r parameter in 
-                      the figure on the lower right corner of the first panel. If 
-                      'default', lambda_r is displayed only when plotting velocities.
+                      the given magnitude and saves it without axes.
     figureconfig    : Configuration/orientation of the final figure; 'horizontal', 
                       'vertical' or '22' (square).
     info            : Text that will appear on the left of the plot instead of "kpc".
-    centeriszero    : If True, the first panel of the map gets normalized so that
-                      the central area has average zero. If 'default', this is True
-                      only for velocity maps.
     savetxt         : File on which to save the numerical data of the plot in text 
                       format. Does not do it if savetxt=None.
     savefigure      : Whether to save the final figure.
@@ -96,76 +77,29 @@ def voronoimap(snap, qty='vel', npanels=4, extent=20,
     """
     if force_orient:
         snap = orient_snap(snap, axisorientation=1, ensure_rotdir=ensure_rotdir)
+    if scalebar == 'reff':
+        scalebar = pygad.analysis.half_mass_radius(snap, proj=1)
+    if sigmapp > 0.:
+        snap = PseudoSnap(snap, npseudoparticles, sigmapp)
 
-    def_titles, cmap, cmaplimits, statsmode, addlambdar, centeriszero = getdefaultplotparams(qty, statsmode, npanels=npanels)
+    def_titles, cmap, cmaplimits, statsmode, addlambdar, centeriszero = getdefaultplotparams(qty)
     if custom_titles is not None:
         titles = custom_titles
     else:
         titles = def_titles
+    if statsmode == "fit":
+        npanels = 4
+    else:
+        npanels = 2
     if plotfile is None:
         plotfile = qty + str(npanels) + 'map'
 
-    if scalebar == 'reff':
-        scalebar = pygad.analysis.half_mass_radius(snap, proj=2)
-
-    if selectqty is None:
-        if sigmapp > 0.:
-            snap = PseudoSnap(snap, npseudoparticles, sigmapp)
-        grid = VoronoiGrid(snap, extent, npixel_per_side=npixel_per_side, partperbin=partperbin, nspaxels=nspaxels)
-        plotquantity = grid.get_stats(qty, weightqty=weightqty, mode=statsmode,
-                                      artificial_error=artificial_error, measerror=measerror, centeriszero=centeriszero)
-        fluxquantity = weightqty  # snap[weightqty]
-        makevoronoimap(plotquantity, grid, npanels=npanels, fluxqty=fluxquantity,
-                       figureconfig=figureconfig, cmap=cmap, cmaplimits=cmaplimits,
-                       titles=titles, titles2=info, plotfile=plotfile,
-                       savefigure=savefigure, cutatmag=cutatmag,
-                       addlambdar=addlambdar,
-                       savetxt=savetxt, scalebar=scalebar)
-
-    else:  # for voronoimaps separated by age/Z
-        selectquantity = snap[selectqty]
-        if selectbounds is None:
-            selectbounds = ['min', 'median', 'max']
-        selecttitle, selectcmap, selectcmaplimits = getdefaultplotparams(selectqty, select=True)
-        for i in np.arange(len(selectbounds)):
-            if type(selectbounds[i]) == str:
-                if selectbounds[i] == "min":
-                    selectbounds[i] = np.min(selectquantity)
-                    print("Min " + selectqty + ": " + str(selectbounds[i]))
-                if selectbounds[i] == "median":
-                    selectbounds[i] = (np.max(selectquantity) - np.min(selectquantity)) / 2.
-                    print("Median " + selectqty + ": " + str(selectbounds[i]))
-                if selectbounds[i] == "max":
-                    selectbounds[i] = np.max(selectquantity)
-                    print("Max " + selectqty + ": " + str(selectbounds[i]))
-            if i > 0:
-                plt.clf()
-                print("\n Producing figure with " + str(selectbounds[i - 1]) + " < " + selectqty + " < " + str(selectbounds[i]))
-                if info is None:
-                    info = ["", "%.1f" % (selectbounds[i - 1]) + " < " + selecttitle[0] + " < " + "%.1f" % (selectbounds[i])]
-                else:
-                    print(selecttitle[0])
-                    info[1] = "%.0f" % (selectbounds[i - 1]) + " < " + selecttitle[0] + " < " + "%.0f" % (
-                    selectbounds[i])
-                selectcond = np.where(np.logical_and(selectbounds[i - 1] < np.array(selectquantity),
-                                                     np.array(selectquantity) < selectbounds[i]))
-                subsnap = snap[selectcond]
-                print("Subsnap has " + str(len(subsnap["ID"])) + " particles.")
-                if sigmapp > 0.:
-                    subsnap = PseudoSnap(subsnap, npseudoparticles, sigmapp)
-                grid = VoronoiGrid(subsnap, extent, npixel_per_side=npixel_per_side,
-                                   partperbin=partperbin, nspaxels=nspaxels)
-                plotquantity = grid.get_stats(qty, weightqty=weightqty, mode=statsmode,
-                                              artificial_error=artificial_error,
-                                              measerror=measerror, centeriszero=centeriszero)
-                fluxquantity = weightqty  # snap[weightqty]
-                makevoronoimap(plotquantity, grid, npanels=npanels,
-                               fluxqty=fluxquantity, figureconfig=figureconfig,
-                               cmap=cmap, cmaplimits=cmaplimits, titles=titles,
-                               titles2=info, plotfile=plotfile + str(i),
-                               savefigure=savefigure, cutatmag=cutatmag,
-                               addlambdar=addlambdar,
-                               savetxt=savetxt, scalebar=scalebar)
+    grid = VoronoiGrid(snap, extent, npixel_per_side=npixel_per_side, partperbin=partperbin, nspaxels=nspaxels)
+    plotquantity = grid.get_stats(qty, weightqty=weightqty, mode=statsmode,
+                                  artificial_error=artificial_error, measerror=measerror, centeriszero=centeriszero)
+    makevoronoimap(plotquantity, grid, npanels=npanels, fluxqty=weightqty, figureconfig=figureconfig, cmap=cmap,
+                   cmaplimits=cmaplimits, titles=titles, titles2=info, plotfile=plotfile, savefigure=savefigure,
+                   cutatmag=cutatmag, addlambdar=addlambdar, savetxt=savetxt, scalebar=scalebar)
     if savefigure:
         plt.close()
 
