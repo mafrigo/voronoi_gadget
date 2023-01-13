@@ -515,13 +515,19 @@ def deduce_cbar_limits(plotquantity, cmaplimits):
     print("Colorbar limits: " + str(cmaplimits))
     return cmaplimits
 
-################################################################################
-# Following routines are from the display_pixels package of Michele Cappellari, #
-# slightly edited by MF to allow for personalized color maps.                   #
-# See http://www-astro.physics.ox.ac.uk/~mxc/software/                          #
-################################################################################
 
-def display_bins(x, y, binNum, qtyBin, ax=None, **kwargs):
+def display_bins(x, y, binNum, qtyBin, ax=None, cmap='Sauron', **kwargs):
+    """
+    Adapted from vorbin (Michele Cappellari)
+    """
+    from scipy.spatial import distance
+
+    plotextent = 1.
+    if ax is None:
+        ax = plt.gca()
+    if cmap == 'sauron':
+        cmap = sauron
+
     if not (x.size == y.size == binNum.size):
         raise ValueError('The vectors (x, y, binNum) must have the same size')
 
@@ -532,29 +538,8 @@ def display_bins(x, y, binNum, qtyBin, ax=None, **kwargs):
         val = qtyBin[binNum]
     else:
         val = np.full(np.shape(x), qtyBin)
-    img = _display_pixels(x, y, val, ax=ax, **kwargs)
 
-    return img
-
-
-def _display_pixels(x, y, val, pixelsize=None, angle=None, cmap='sauron',
-                    ax=None, **kwargs):
-    """
-    Display vectors of square pixels at coordinates (x,y) coloured with "val".
-    An optional rotation around the origin can be applied to the whole image.
-    
-    The pixels are assumed to be taken from a regular cartesian grid with 
-    constant spacing (like an image), but not all elements of the grid are 
-    required (missing data are OK).
-
-    This routine is designed to be fast even with large images and to produce
-    minimal file sizes when the output is saved in a vector format like PDF.
-
-    """
-
-    from scipy.spatial import distance
-    if pixelsize is None:
-        pixelsize = np.min(distance.pdist(np.column_stack([x, y])))
+    pixelsize = np.min(distance.pdist(np.column_stack([x, y])))
 
     xmin, xmax = np.min(x), np.max(x)
     ymin, ymax = np.min(y), np.max(y)
@@ -562,49 +547,17 @@ def _display_pixels(x, y, val, pixelsize=None, angle=None, cmap='sauron',
     ny = int(round((ymax - ymin) / pixelsize) + 1)
     j = np.round((x - xmin) / pixelsize).astype(int)
     k = np.round((y - ymin) / pixelsize).astype(int)
-    # print(nx, ny)
     mask = np.ones((nx, ny), dtype=bool)
     img = np.empty((nx, ny))
     mask[j, k] = 0
     img[j, k] = val
     img = np.ma.masked_array(img, mask)
-
-    if ax == None:
-        ax = plt.gca()
-    plotextent = 1.
-
-    if cmap == 'sauron':
-        cmap = sauron
-
-    if (angle is None) or (angle == 0):
-
-        img = ax.imshow(np.rot90(img), interpolation='none', cmap=cmap,
-                        # cmap=kwargs.get("cmap", sauron),
-                        extent=[plotextent * (xmin - pixelsize / 2),
-                                plotextent * (xmax + pixelsize / 2),
-                                plotextent * (ymin - pixelsize / 2),
-                                plotextent * (ymax + pixelsize / 2)],
-                        **kwargs)
-
-    else:
-
-        x, y = np.ogrid[xmin - pixelsize / 2: xmax + pixelsize / 2: (nx + 1) * 1j,
-               ymin - pixelsize / 2: ymax + pixelsize / 2: (ny + 1) * 1j]
-        ang = np.radians(angle)
-        x, y = x * np.cos(ang) - y * np.sin(ang), x * np.sin(ang) + y * np.cos(ang)
-
-        mask1 = np.ones_like(x, dtype=bool)
-        mask1[:-1, :-1] *= mask  # Flag the four corners of the mesh
-        mask1[:-1, 1:] *= mask
-        mask1[1:, :-1] *= mask
-        mask1[1:, 1:] *= mask
-        x = np.ma.masked_array(x, mask1)  # Mask is used for proper plot range
-        y = np.ma.masked_array(y, mask1)
-
-        img = ax.pcolormesh(x, y, img, cmap=cmap,  # cmap=kwargs.get("cmap", sauron),
-                            edgecolors="face", **kwargs)
-        ax.axis('image')
-
+    img = ax.imshow(np.rot90(img), interpolation='none', cmap=cmap,
+                    extent=[plotextent * (xmin - pixelsize / 2),
+                            plotextent * (xmax + pixelsize / 2),
+                            plotextent * (ymin - pixelsize / 2),
+                            plotextent * (ymax + pixelsize / 2)],
+                    **kwargs)
     ax.minorticks_on()
     ax.tick_params(length=10, width=1, which='major')
     ax.tick_params(length=5, width=1, which='minor')
