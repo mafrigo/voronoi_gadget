@@ -37,4 +37,4 @@ def getdefaultplotparams(qty, statsmode=None, select=False, npanels=4):
             else:
                 cfg[key] = default_cfg[key]
         cfg["titles"] = [r"$%s$" % title for title in cfg["titles"]]
-    return cfg["titles"], cfg["cmap"], cfg["cmaplimits"]
+    return cfg["titles"], cfg["cmap"], cfg["cmaplimits"], cfg["statsmode"], cfg["addlambdar"], cfg["centeriszero"]

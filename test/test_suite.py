@@ -72,7 +72,7 @@ class TestEndToEnd(unittest.TestCase):
             os.remove(test_output_image)
         snap = generate_snapshot(100000)
         voronoimap(snap, "vel", extent=4., scalebar=1., force_orient=False, npixel_per_side=50, nspaxels=100,
-                   addlambdar=False, plotfile=test_output_image)
+                   plotfile=test_output_image)
         self.assertEqual(os.path.exists(test_output_image), True)
 
 

@@ -11,6 +11,9 @@ vel:
   - minmax
   - symmetric
   - symmetric
+  statsmode: fit
+  addlambdar: false
+  centeriszero: true
 age:
   cmap: Spectral_r
   titles:
@@ -62,3 +65,6 @@ default:
   - minmax
   - symmetric
   - symmetric
+  statsmode: sample
+  addlambdar: false
+  centeriszero: false

@@ -15,11 +15,11 @@ from voronoi_gadget.defaults import getdefaultplotparams, get_style_config
 def voronoimap(snap, qty='vel', npanels=4, extent=20,
                npixel_per_side=200, partperbin=None, nspaxels=500,
                statsmode='default', weightqty='mass', selectqty=None,
-               selectbounds=None, sigmapp=-1., npseudoparticles=60, cmap=None,
-               cmaplimits=None, force_orient=True, ensure_rotdir=True,
-               artificial_error=0., measerror=0., scalebar='reff',
-               cutatmag=None, addlambdar='default', figureconfig='horizontal',
-               info=None, centeriszero='default', plotfile=None, savetxt=None,
+               selectbounds=None, sigmapp=-1., npseudoparticles=60,
+               force_orient=True, ensure_rotdir=True,
+               artificial_error=0., measerror=0., scalebar=None,
+               cutatmag=None, figureconfig='horizontal',
+               info=None, plotfile=None, savetxt=None,
                savefigure=True, custom_titles=None):
     """
     Plots a quantity using a Voronoi-binned grid, calculated so that each cell 
@@ -66,11 +66,6 @@ def voronoimap(snap, qty='vel', npanels=4, extent=20,
                       sigma sigmapp. If negative, no such expansion is performed.
     npseudoparticles: Number of pseudoparticles per original particle. Unused if 
                       sigmapp<0.
-    cmap            : Color map for the plot. In addition to the standard matplotlib 
-                      ones, the 'sauron' one (Sauron, Atlas3D,...) is also available.
-    cmaplimits      : Color map limits for the 4 panels. Must be in the form 
-                      [[minavg, maxavg], [mindisp, maxdisp], [minh3,maxh3], [minh4,
-                      maxh4]].
     force_edgeon    : Whether to forcefully reorient the snapshot so that the galaxy 
                       is seen edge-on (uses pygad's prepare_zoom).
     ensure_rotdir   : If True, the rotation direction will be forced to be always
@@ -99,38 +94,16 @@ def voronoimap(snap, qty='vel', npanels=4, extent=20,
     plotfile        : Name of the final plot file. Standard is qty+str(npanels)+'map'
                       (e.g. "vel4map.png").
     """
-
     if force_orient:
         snap = orient_snap(snap, axisorientation=1, ensure_rotdir=ensure_rotdir)
 
-    def_titles, defaultcmap, defaultcmaplimits = getdefaultplotparams(qty, statsmode, npanels=npanels)
+    def_titles, cmap, cmaplimits, statsmode, addlambdar, centeriszero = getdefaultplotparams(qty, statsmode, npanels=npanels)
     if custom_titles is not None:
         titles = custom_titles
     else:
         titles = def_titles
-
-    if cmap is None:
-        cmap = defaultcmap
-    if cmaplimits is None:
-        cmaplimits = defaultcmaplimits
     if plotfile is None:
         plotfile = qty + str(npanels) + 'map'
-
-    if statsmode == 'default':
-        if npanels > 2:
-            statsmode = 'fit'
-        else:
-            statsmode = 'sample'
-    if addlambdar == 'default':
-        if qty == 'vel' or qty == 'lambdar':
-            addlambdar = True
-        else:
-            addlambdar = False
-    if centeriszero == 'default':
-        if qty == 'vel' or qty == 'lambdar':
-            centeriszero = True
-        else:
-            centeriszero = False
 
     if scalebar == 'reff':
         scalebar = pygad.analysis.half_mass_radius(snap, proj=2)
