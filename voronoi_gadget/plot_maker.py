@@ -222,7 +222,7 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
             cax = divider.append_axes("right", size="5%", pad=0.05)
             if cfg["ncbarlabels"] is None:
                 cb = plt.colorbar(img, cax=cax)
-                cb.ax.tick_params(labelsize=cfg["digitsize"], labelcolor=cfg["text_color"])
+                cb.ax.tick_params(labelsize=cfg["digitsize"], color=cfg["text_color"], labelcolor=cfg["text_color"])
             else:  # Calculating optimal colormap tick distribution
                 cspan = (cmaplimits[i][1] - cmaplimits[i][0]) / (cfg["ncbarlabels"] - 1)
                 # cspan: separation between colorbar ticks/labels
@@ -249,7 +249,7 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
                         cticks.append(lowerlimit + cspan * (itick))
                 print("Colorbar ticks (" + str(i) + "): " + str(cticks))
                 cb = plt.colorbar(img, cax=cax, ticks=cticks)
-                cb.ax.tick_params(labelsize=cfg["digitsize"] * 1.1, labelcolor=cfg["text_color"])
+                cb.ax.tick_params(labelsize=cfg["digitsize"] * 1.1, color=cfg["text_color"], labelcolor=cfg["text_color"])
 
         plt.subplots_adjust(wspace=0.3)
         fig.patch.set_facecolor(cfg["background_color"])
