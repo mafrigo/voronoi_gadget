@@ -67,9 +67,7 @@ class VoronoiGrid(object):
         return np.array([self.qty_in_spaxel(qtylabel, ispaxel, qtyarray=qty)
                          for ispaxel in self.binNum])
 
-    def get_stats(self, qty, weightqty='mass', mode='sample',
-                     artificial_error=0., measerror=0., quiet=True,
-                     centeriszero=False):
+    def get_stats(self, qty, weightqty='mass', mode='sample', quiet=True, centeriszero=False):
         """
         Calculates average, dispersion, h3 and h4 of quantity "qty" for all
         the spaxels of a given voronoigrid.
