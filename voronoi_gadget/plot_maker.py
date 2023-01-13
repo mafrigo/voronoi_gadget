@@ -330,7 +330,7 @@ def display_bins(x, y, binNum, qtyBin, ax=None, cmap='Sauron', plotextent_fac=1.
     mask[j, k] = 0
     img[j, k] = val
     img = np.ma.masked_array(img, mask)
-    img = ax.imshow(img, interpolation=interpolation, cmap=cmap,
+    img = ax.imshow(np.rot90(img), interpolation=interpolation, cmap=cmap,
                     extent=[plotextent_fac * (xmin - pixelsize / 2), plotextent_fac * (xmax + pixelsize / 2),
                             plotextent_fac * (ymin - pixelsize / 2), plotextent_fac * (ymax + pixelsize / 2)],
                     **kwargs)

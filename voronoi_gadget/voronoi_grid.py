@@ -32,12 +32,8 @@ class VoronoiGrid(object):
     def __init__(self, snap, extent, weightqty=None, npixel_per_side=200,
                  nspaxels=500, partperbin=None):
 
-        if nspaxels == 0:
-            voronoibinning = False
-        else:
-            voronoibinning = True
         posx = snap["pos"][:, 0]
-        posy = snap["pos"][:, 1]
+        posy = snap["pos"][:, 2]
         if weightqty is None:
             weights = np.full(np.shape(posx), 1.)
         else:
@@ -46,7 +42,7 @@ class VoronoiGrid(object):
             # Weighted number of particles
 
         spaxelofpart, xvor, yvor, xBar, yBar, binNum = _makegrid(posx, posy,
-                                                                 weights, extent, voronoibinning=voronoibinning,
+                                                                 weights, extent,
                                                                  npixel_per_side=npixel_per_side,
                                                                  partperbin=partperbin, nvoronoibins=nspaxels)
         self._spaxelofpart = spaxelofpart
@@ -123,7 +119,7 @@ class VoronoiGrid(object):
         return stats
 
 
-def _makegrid(posx, posy, weights, extent, voronoibinning=True,
+def _makegrid(posx, posy, weights, extent,
               npixel_per_side=200, partperbin=None, nvoronoibins=500):
     import scipy.stats as stats
     from vorbin.voronoi_2d_binning import voronoi_2d_binning
