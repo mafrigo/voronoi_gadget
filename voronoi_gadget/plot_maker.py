@@ -86,7 +86,7 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
             range=[[-grid.extent / 2., grid.extent / 2.], [-grid.extent / 2., grid.extent / 2.]])
         if fluxcontours == 'smooth':
             # gaussian smoothing with sigma 2 pixels
-            flux = scipy.ndimage.gaussian_filter(flux, int(grid.npixel_per_side / 100.))  # 1.)
+            flux = scipy.ndimage.gaussian_filter(flux, int(grid.npixel_per_side / 50.))  # 1.)
         flux = flux.reshape(grid.npixel_per_side ** 2)
         xflux = grid.xvor
         yflux = grid.yvor
