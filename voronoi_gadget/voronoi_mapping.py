@@ -16,7 +16,7 @@ def voronoimap(snap, qty='vel', npanels=4, extent=20,
                npixel_per_side=200, partperbin=None, nspaxels=500,
                statsmode='default', weightqty='mass', selectqty=None,
                selectbounds=None, sigmapp=-1., npseudoparticles=60, cmap=None,
-               cmaplimits=None, force_edgeon=True, ensure_rotdir=True,
+               cmaplimits=None, force_orient=True, ensure_rotdir=True,
                artificial_error=0., measerror=0., scalebar='reff',
                cutatmag=None, addlambdar='default', figureconfig='horizontal',
                info=None, centeriszero='default', plotfile=None, savetxt=None,
@@ -100,15 +100,8 @@ def voronoimap(snap, qty='vel', npanels=4, extent=20,
                       (e.g. "vel4map.png").
     """
 
-    if force_edgeon:
-        snap = orient_snap(snap, axisorientation=1)
-
-    if ensure_rotdir:
-        # ensures that the angular momentum vector is always pointing in the same direction
-        rangmom = 0.5 * extent
-        angmomy = snap["mass"] * (snap["vel"][:, 2] * snap["pos"][:, 1] - snap["vel"][:, 1] * snap["pos"][:, 2])
-        if np.mean(angmomy[snap["pos"][:, 0] ** 2 + snap["pos"][:, 1] ** 2 < rangmom ** 2]) > 0:
-            snap["pos"] = -snap["pos"]
+    if force_orient:
+        snap = orient_snap(snap, axisorientation=1, ensure_rotdir=ensure_rotdir)
 
     def_titles, defaultcmap, defaultcmaplimits = getdefaultplotparams(qty, statsmode, npanels=npanels)
     if custom_titles is not None:
@@ -174,11 +167,9 @@ def voronoimap(snap, qty='vel', npanels=4, extent=20,
                     print("Max " + selectqty + ": " + str(selectbounds[i]))
             if i > 0:
                 plt.clf()
-                print("\n Producing figure with " + str(selectbounds[i - 1]) + " < " + \
-                      selectqty + " < " + str(selectbounds[i]))
+                print("\n Producing figure with " + str(selectbounds[i - 1]) + " < " + selectqty + " < " + str(selectbounds[i]))
                 if info is None:
-                    info = ["", "%.1f" % (selectbounds[i - 1]) + " < " + selecttitle[0] + \
-                            " < " + "%.1f" % (selectbounds[i])]
+                    info = ["", "%.1f" % (selectbounds[i - 1]) + " < " + selecttitle[0] + " < " + "%.1f" % (selectbounds[i])]
                 else:
                     print(selecttitle[0])
                     info[1] = "%.0f" % (selectbounds[i - 1]) + " < " + selecttitle[0] + " < " + "%.0f" % (

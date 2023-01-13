@@ -29,7 +29,7 @@ def generate_snapshot(N_stars, size=1, velocity_scale=200.):
     return snap
 
 
-def orient_snap(snap, axisorientation=1, rangmom=1., gal_R200=0.1):
+def orient_snap(snap, axisorientation=1, rangmom=1., gal_R200=0.1, ensure_rotdir=False):
     """
     Orients snap to the principal axes of inertia.
     axisorientation==1: intermediate axis is along the line-of-sight (edge-on orientation).
@@ -73,6 +73,13 @@ def orient_snap(snap, axisorientation=1, rangmom=1., gal_R200=0.1):
     # a consistent direction:
     R200, M200 = pygad.analysis.virial_info(s)
     s = s[pygad.BallMask(gal_R200 * R200)]
+
+    if ensure_rotdir:
+        # ensures that the angular momentum vector is always pointing in the same direction
+        rangmom = 5.
+        angmomy = snap["mass"] * (snap["vel"][:, 2] * snap["pos"][:, 1] - snap["vel"][:, 1] * snap["pos"][:, 2])
+        if np.mean(angmomy[snap["pos"][:, 0] ** 2 + snap["pos"][:, 1] ** 2 < rangmom ** 2]) > 0:
+            snap["pos"] = -snap["pos"]
     return s
 
 
