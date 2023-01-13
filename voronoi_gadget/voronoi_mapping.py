@@ -1,16 +1,16 @@
 __all__ = ["voronoimap", "makevoronoimap"]
 
-import pygad
+import numpy as np
 import matplotlib.pyplot as plt
 import mpl_toolkits.axes_grid1 as mplax
 import scipy
+import pygad
 from matplotlib import colors
 from voronoi_gadget.snapshot_tools import *
 from voronoi_gadget.voronoi_grid import *
 from voronoi_gadget.sauron_cmap import *
 from voronoi_gadget.lambdar import _lambdar
 from voronoi_gadget.defaults import getdefaultplotparams
-
 
 # Style parameters for the standard Voronoi plot
 labelsize = 17  # 20
@@ -120,8 +120,7 @@ def voronoimap(snap, qty='vel', npanels=4, extent=20,
         if np.mean(angmomy[snap["pos"][:, 0] ** 2 + snap["pos"][:, 1] ** 2 < rangmom ** 2]) > 0:
             snap["pos"] = -snap["pos"]
 
-    def_titles, defaultcmap, defaultcmaplimits = getdefaultplotparams(qty, statsmode,
-                                                                      npanels=npanels)
+    def_titles, defaultcmap, defaultcmaplimits = getdefaultplotparams(qty, statsmode, npanels=npanels)
     if custom_titles is not None:
         titles = custom_titles
     else:
@@ -156,11 +155,9 @@ def voronoimap(snap, qty='vel', npanels=4, extent=20,
     if selectqty is None:
         if sigmapp > 0.:
             snap = PseudoSnap(snap, npseudoparticles, sigmapp)
-        grid = VoronoiGrid(snap, extent, npixel_per_side=npixel_per_side,
-                           partperbin=partperbin, nspaxels=nspaxels)
+        grid = VoronoiGrid(snap, extent, npixel_per_side=npixel_per_side, partperbin=partperbin, nspaxels=nspaxels)
         plotquantity = grid.get_stats(qty, weightqty=weightqty, mode=statsmode,
-                                      artificial_error=artificial_error,
-                                      measerror=measerror, centeriszero=centeriszero)
+                                      artificial_error=artificial_error, measerror=measerror, centeriszero=centeriszero)
         fluxquantity = weightqty  # snap[weightqty]
         makevoronoimap(plotquantity, grid, npanels=npanels, fluxqty=fluxquantity,
                        figureconfig=figureconfig, cmap=cmap, cmaplimits=cmaplimits,
@@ -194,20 +191,19 @@ def voronoimap(snap, qty='vel', npanels=4, extent=20,
                             " < " + "%.1f" % (selectbounds[i])]
                 else:
                     print(selecttitle[0])
-                    info[1] = "%.0f" % (selectbounds[i - 1]) + " < " + selecttitle[0] + " < " + "%.0f" % (selectbounds[i])
+                    info[1] = "%.0f" % (selectbounds[i - 1]) + " < " + selecttitle[0] + " < " + "%.0f" % (
+                    selectbounds[i])
                 selectcond = np.where(np.logical_and(selectbounds[i - 1] < np.array(selectquantity),
-                                      np.array(selectquantity) < selectbounds[i]))
+                                                     np.array(selectquantity) < selectbounds[i]))
                 subsnap = snap[selectcond]
                 print("Subsnap has " + str(len(subsnap["ID"])) + " particles.")
                 if sigmapp > 0.:
                     subsnap = PseudoSnap(subsnap, npseudoparticles, sigmapp)
                 grid = VoronoiGrid(subsnap, extent, npixel_per_side=npixel_per_side,
                                    partperbin=partperbin, nspaxels=nspaxels)
-                plotquantity = grid.get_stats(qty, weightqty=weightqty,
-                                              mode=statsmode,
+                plotquantity = grid.get_stats(qty, weightqty=weightqty, mode=statsmode,
                                               artificial_error=artificial_error,
-                                              measerror=measerror,
-                                              centeriszero=centeriszero)
+                                              measerror=measerror, centeriszero=centeriszero)
                 fluxquantity = weightqty  # snap[weightqty]
                 makevoronoimap(plotquantity, grid, npanels=npanels,
                                fluxqty=fluxquantity, figureconfig=figureconfig,
@@ -333,7 +329,6 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
 
     if (xflux.any() is None and yflux.any() is None):  # added .any
         xflux, yflux = grid.xBar, grid.yBar
-    maplimits = [-grid.extent / 2, grid.extent / 2, -grid.extent / 2, grid.extent / 2]
     if titles2 is None:
         titles2 = 2 * [" "]
 
@@ -346,7 +341,7 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
             plt.subplot(int(100 + npanels * 10 + (i + 1)))
             plt.gca().tick_params(axis='x', labelbottom='off')
             if i == 0:
-                plt.ylabel(titles3, fontsize=textsize)  # , labelpad=-20)
+                plt.ylabel(titles3, fontsize=textsize)
             else:
                 plt.gca().tick_params(labelleft='off')  # left
         if figureconfig == 'vertical':
@@ -370,13 +365,10 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
             ylength = grid.extent  # np.max(yvor)-np.min(yvor)
             # Custom titles in left side of first panel
             if len(titles2) > 0:  # above and below
-                plt.text(minx + 0.03 * xlength, miny + 0.03 * ylength,
-                         titles2[0], fontsize=labelsize, color=textcolor)
-                plt.text(minx + 0.03 * xlength, miny + 0.89 * ylength,
-                         titles2[1], fontsize=labelsize, color=textcolor)
+                plt.text(minx + 0.03 * xlength, miny + 0.03 * ylength, titles2[0], fontsize=labelsize, color=textcolor)
+                plt.text(minx + 0.03 * xlength, miny + 0.89 * ylength, titles2[1], fontsize=labelsize, color=textcolor)
             else:  # just below
-                plt.text(minx + 0.03 * xlength, miny + 0.03 * ylength,
-                         titles2, fontsize=labelsize, color=textcolor)
+                plt.text(minx + 0.03 * xlength, miny + 0.03 * ylength, titles2, fontsize=labelsize, color=textcolor)
 
             if scalebar is not None:  # scale bar on the left axis
                 # plt.axhline(y=np.min(yvor)+0.89*ylength, linewidth=2, color='k',
@@ -397,10 +389,8 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
                 reff = pygad.analysis.half_mass_radius(grid._snap, proj=2)
                 print("Effective radius: " + str(reff))
                 lambdaR = _lambdar(grid, plotquantity, rmax=reff)[-1]
-                plt.text(minx + 0.6 * xlength,  # 0.53
-                         miny + 0.03 * ylength,
-                         r"$\lambda_R = %.2f$" % (lambdaR), fontsize=labelsize,
-                         color=textcolor)
+                plt.text(minx + 0.6 * xlength, miny + 0.03 * ylength, r"$\lambda_R = %.2f$" % (lambdaR),
+                         fontsize=labelsize, color=textcolor)
 
         # Actually plotting the colors
         img = display_bins(grid.xvor, grid.yvor, grid.binNum, plotquantity[:, i], vmin=cmaplimits[i][0],
@@ -419,8 +409,7 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
                                    levels=np.arange(5), colors='k',  # 20
                                    linewidths=contourthickness)
                 except:
-                    print("Warning: Impossible to print contours; problem " \
-                          + "with the data")
+                    print("Warning: Impossible to print contours; problem with the data")
                     print(xflux, yflux, flux)
 
             # Adjusting axes ticks
@@ -449,12 +438,10 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
                         cmaplimits[i][0] = np.min(plotquantity[:, i])
                     # limitorder=int(np.floor(np.log10(abs(cmaplimits[i][0]))))
                     limitorder = int(np.floor(np.log10(abs(cmaplimits[i][1]))))
-                    lowerlimit = (10. ** (limitorder - 1)) * np.ceil(cmaplimits[i][0] / \
-                                                                     (10. ** (limitorder - 1)))
+                    lowerlimit = (10. ** (limitorder - 1)) * np.ceil(cmaplimits[i][0] / (10. ** (limitorder - 1)))
                     cspan = (cmaplimits[i][1] - lowerlimit) / (ncbarlabels - 1)
                     # truncating cspan to avoid lots of decimals
-                cspan = (10. ** (cspanorder - 1)) * np.trunc(cspan / \
-                                                             (10. ** (cspanorder - 1)))
+                cspan = (10. ** (cspanorder - 1)) * np.trunc(cspan / (10. ** (cspanorder - 1)))
                 if cspanorder > 0:
                     cspan = int(cspan)
                 if cmaplimits[i][1] == -cmaplimits[i][0]:
@@ -485,14 +472,10 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
     plt.pause(0.01)
 
     if savetxt is not None:
-        np.savetxt(savetxt + '.kin', np.transpose(np.array([plotquantity[:, 0],
-                                                            plotquantity[:, 1],
-                                                            plotquantity[:, 2],
-                                                            plotquantity[:, 3],
+        np.savetxt(savetxt + '.kin', np.transpose(np.array([plotquantity[:, 0], plotquantity[:, 1],
+                                                            plotquantity[:, 2], plotquantity[:, 3],
                                                             fluxvoro, grid.xBar, grid.yBar])))
-        np.savetxt(savetxt + '.grid', np.transpose(np.array([grid.xvor,
-                                                             grid.yvor,
-                                                             grid.binNum])))
+        np.savetxt(savetxt + '.grid', np.transpose(np.array([grid.xvor, grid.yvor, grid.binNum])))
 
 
 def deduce_cbar_limits(plotquantity, cmaplimits):
@@ -506,17 +489,17 @@ def deduce_cbar_limits(plotquantity, cmaplimits):
         if cmaplimits[ipanel] in ['symmetric', 'minmax']:
             pltqty = plotquantity[:, ipanel][
                 np.logical_and(plotquantity[:, ipanel] != -np.inf, plotquantity[:, ipanel] != np.inf)]
-        if cmaplimits[ipanel] == 'symmetric':
-            cmaplimits[ipanel] = [-np.max(abs(pltqty)), np.max(abs(pltqty))]
-        elif cmaplimits[ipanel] == 'minmax':
-            cmaplimits[ipanel] = [np.min(pltqty), np.max(pltqty)]
-        else:
-            pass
+            if cmaplimits[ipanel] == 'symmetric':
+                cmaplimits[ipanel] = [-np.max(abs(pltqty)), np.max(abs(pltqty))]
+            elif cmaplimits[ipanel] == 'minmax':
+                cmaplimits[ipanel] = [np.min(pltqty), np.max(pltqty)]
+            else:
+                pass
     print("Colorbar limits: " + str(cmaplimits))
     return cmaplimits
 
 
-def display_bins(x, y, binNum, qtyBin, ax=None, cmap='Sauron', plotextent_fac = 1., **kwargs):
+def display_bins(x, y, binNum, qtyBin, ax=None, cmap='Sauron', plotextent_fac=1., **kwargs):
     """
     Adapted from vorbin (Michele Cappellari)
     """
@@ -552,10 +535,8 @@ def display_bins(x, y, binNum, qtyBin, ax=None, cmap='Sauron', plotextent_fac = 
     img[j, k] = val
     img = np.ma.masked_array(img, mask)
     img = ax.imshow(np.rot90(img), interpolation='none', cmap=cmap,
-                    extent=[plotextent_fac * (xmin - pixelsize / 2),
-                            plotextent_fac * (xmax + pixelsize / 2),
-                            plotextent_fac * (ymin - pixelsize / 2),
-                            plotextent_fac * (ymax + pixelsize / 2)],
+                    extent=[plotextent_fac * (xmin - pixelsize / 2), plotextent_fac * (xmax + pixelsize / 2),
+                            plotextent_fac * (ymin - pixelsize / 2), plotextent_fac * (ymax + pixelsize / 2)],
                     **kwargs)
     ax.minorticks_on()
     ax.tick_params(length=10, width=1, which='major')
