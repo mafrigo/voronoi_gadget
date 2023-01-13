@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pygad
 from voronoi_gadget.snapshot_tools import *
 from voronoi_gadget.voronoi_grid import *
-from voronoi_gadget.defaults import getdefaultplotparams
+from voronoi_gadget.defaults import get_plot_config
 from voronoi_gadget.plot_maker import makevoronoimap
 
 
@@ -52,7 +52,7 @@ def voronoimap(snap, qty='vel', grid=None, extent=20, npixel_per_side=200, partp
     plotfile        : Name of the final plot file. Standard is qty+str(npanels)+'map' (e.g. "vel4map.png").
     """
     # Loading default parameters
-    def_titles, cmap, cmaplimits, statsmode, addlambdar, centeriszero = getdefaultplotparams(qty)
+    def_titles, cmap, cmaplimits, statsmode, addlambdar, centeriszero = get_plot_config(qty)
     if custom_titles is not None:
         titles = custom_titles
     else:
@@ -65,6 +65,8 @@ def voronoimap(snap, qty='vel', grid=None, extent=20, npixel_per_side=200, partp
         plotfile = qty + str(npanels) + 'map'
 
     # Loading and preparing snapshot
+    if type(snap) == str:
+        snap, = pygad.prepare_zoom(snap)
     if force_orient:
         snap = orient_snap(snap, axisorientation=1, ensure_rotdir=ensure_rotdir)
     if scalebar == 'reff':
@@ -83,4 +85,3 @@ def voronoimap(snap, qty='vel', grid=None, extent=20, npixel_per_side=200, partp
                    cutatmag=cutatmag, addlambdar=addlambdar, savetxt=savetxt, scalebar=scalebar)
     if savefigure:
         plt.close()
-

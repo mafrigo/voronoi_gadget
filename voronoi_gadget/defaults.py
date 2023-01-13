@@ -20,7 +20,7 @@ def get_style_config(style='default'):
     return cfg
 
 
-def getdefaultplotparams(qty, statsmode=None, select=False, npanels=4):
+def get_plot_config(qty, statsmode=None, select=False, npanels=4):
     """
     For a given quantity, returns default subplot titles, colormap, FF
     colormap limit type (symmetric or not).
