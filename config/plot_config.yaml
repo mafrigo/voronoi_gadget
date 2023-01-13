@@ -1,0 +1,64 @@
+# Config that is dependent on the quantity getting plotted
+vel:
+  cmap: sauron
+  titles:
+  - V_{avg} (\rm km/s)
+  - \sigma (\rm km/s)
+  - h_3
+  - h_4
+  cmaplimits:
+  - symmetric
+  - minmax
+  - symmetric
+  - symmetric
+age:
+  cmap: Spectral_r
+  titles:
+  - \rm Stellar \, age \, (\rm Gyr)
+  - \sigma_{\rm age} \, (\rm Gyr)
+  - h_3
+  - h_4
+logage:
+  cmap: Spectral_r
+  titles:
+  - \rm log_{10} \, \rm age \, (\rm Gyr)
+  - \sigma_{\rmlog \, age} (\rm Gyr)
+  - h_3
+  - h_4
+ZH:
+  titles:
+  - \rm log(Z/Z_\odot)
+  - \sigma_{Z}
+  - h_3
+  - h_4
+alphafe:
+  titles:
+  - \alpha/{\rm Fe}]
+  - \sigma_{[\alpha/{\rm Fe}]}
+  - h_3
+  - h_4
+OFe:
+  cmap: afmhot
+  titles:
+  - "[{\rm O}/{\rm Fe}]"
+  - \sigma_{[{\rm O}/{\rm Fe}]}
+  - h_3
+  - h_4
+temp:
+  titles:
+  - T\, (K)
+  - \sigma_{\rm T} \, (K)
+  - h_3
+  - h_4
+default:
+  cmap: viridis
+  titles:
+  - qty
+  - \sigma_qty
+  - h_3
+  - h_4
+  cmaplimits:
+  - minmax
+  - minmax
+  - symmetric
+  - symmetric
