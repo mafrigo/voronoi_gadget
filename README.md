@@ -1,4 +1,6 @@
 # voronoi_gadget
+Matteo Frigo (Max Planck Institute for Astrophysics, 2016 - 2022)
+
 ![Alt text](example_output.png?raw=true "Galaxy Kinematics example")
 
 ## Description
@@ -6,6 +8,7 @@ Creates mock integral field unit (IFU) galaxy images from galaxy simulations, li
 Each Voronoi bin (spaxel) contains roughly the same number of simulation particles in projection. 
 This simulates the signal-to-noise criterion used in real IFU maps to determine the bin shape and size.
 For a given Voronoi grid any quantity stored or derivable from the snapshot (line-of-sight velocity, metallicity, stellar age) can be plotted.
+In the case of velocity maps, it calculates the higher order moments h_3 and h_4 with a Gauss-Hermite fit, in addition to mean and dispersion.
 
 The code uses the [pygad](https://bitbucket.org/broett/pygad) library to open simulation snapshots, 
 meaning it supports natively Gadget and Arepo simulations, but it can also be used on 

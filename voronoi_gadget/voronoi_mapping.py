@@ -1,16 +1,3 @@
-"""
-by Matteo Frigo (Max Planck Institute for Astrophysics)
-Last update: 14 May 2018
-
-Plots voronoi-binned maps of velocity, metallicity and age of Gadget snapshots. 
-Can plot average, dispersion, h3 and h4. Can plot separately the maps for particles
-selected by a certain property (ex: age larger or smaller than 7 Gyr). Uses voronoi
-binning routines by Cappellari & Copin (2003), available at: 
-
-http://www-astro.physics.ox.ac.uk/~mxc/software/voronoi_python_2016-04-12.zip
-
-"""
-
 __all__ = ["voronoimap", "makevoronoimap", "lambdar"]
 
 import pygad
