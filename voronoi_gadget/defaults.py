@@ -5,7 +5,7 @@ def get_style_config(style='default'):
 
     import yaml
     from pathlib import Path
-    config_path = Path(__file__).parent / "../style_config.yaml"
+    config_path = Path(__file__).parent / "../config/style_config.yaml"
     with open(config_path, "r") as ymlfile:
         content = yaml.load(ymlfile, Loader=yaml.FullLoader)
         cfg = dict()
