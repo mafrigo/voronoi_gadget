@@ -17,9 +17,16 @@ other formats with some tweaking.
 It also uses the [vorbin](https://pypi.org/project/vorbin/) package by Michele Cappellari for creating the Voronoi grid, 
 therefore any paper using this should cite [Cappellari & Copin 2003](http://adsabs.harvard.edu/abs/2003MNRAS.342..345C).
 
+## Install:
+```bash
+git clone https://github.com/mafrigo/voronoi_gadget.git
+cd voronoi_gadget
+pip install .
+```
+
 ## Usage example:
 ```python
-import pygadmpa as pygad
+import pygad
 import voronoi_gadget as vg
 
 # Load a gadget snapshot file into a snap object with pygad
