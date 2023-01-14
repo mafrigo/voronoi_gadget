@@ -1,7 +1,8 @@
 # voronoi_gadget
 Matteo Frigo (Max Planck Institute for Astrophysics, 2016 - 2022)
 
-![Alt text](example_output.png?raw=true "Galaxy Kinematics example")
+![Alt text](example_output/vel4map.png?raw=true "Stellar kinematics example")
+![Alt text](example_output/ZH2map.png?raw=true "Stellar metallicity example")
 
 ## Description
 Creates mock integral field unit (IFU) galaxy images from galaxy simulations, like the one shown above. 

@@ -1,4 +1,4 @@
-__all__ = ["generate_snapshot", "PseudoSnap", "orient_snap"]
+__all__ = ["generate_snapshot", "PseudoSnap", "orient_snap", "openfile"]
 
 import numpy as np
 try:
@@ -10,8 +10,13 @@ except ImportError:
     print("Running without pygad")
 
 
-def openfile(filename):
-    return filename
+def openfile(snap, force_orient=False, ensure_rotdir=False):
+    if type(snap) == str:
+        snap, b, c = pygad.prepare_zoom(snap, mode='ssc')
+        snap = snap.stars
+    if force_orient:
+        snap = orient_snap(snap, axisorientation=1, ensure_rotdir=ensure_rotdir)
+    return snap
 
 
 def generate_snapshot(N_stars, size=1, velocity_scale=200.):
