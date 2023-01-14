@@ -68,6 +68,7 @@ def voronoimap(snap, qty='vel', grid=None, extent=20, npixel_per_side=200, partp
     # Loading and preparing snapshot
     if type(snap) == str:
         snap, b, c = pygad.prepare_zoom(snap, mode='ssc')
+        snap = snap.stars
     if force_orient:
         snap = orient_snap(snap, axisorientation=1, ensure_rotdir=ensure_rotdir)
     if scalebar == 'reff':
