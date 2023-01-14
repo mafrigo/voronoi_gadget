@@ -7,6 +7,7 @@ def get_style_config(style='default'):
     Read style_config.yaml
     """
     config_path = Path(__file__).parent / "config/style_config.yaml"
+    print("Reading config file: " + str(config_path))
     with open(config_path, "r") as ymlfile:
         content = yaml.load(ymlfile, Loader=yaml.FullLoader)
         cfg = dict()
@@ -26,6 +27,7 @@ def get_plot_config(qty, statsmode=None, select=False, npanels=4):
     colormap limit type (symmetric or not).
     """
     config_path = Path(__file__).parent / "config/plot_config.yaml"
+    print("Reading config file: " + str(config_path))
     with open(config_path, "r") as ymlfile:
         content = yaml.load(ymlfile, Loader=yaml.FullLoader)
         cfg = dict()

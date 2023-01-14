@@ -64,7 +64,8 @@ You can see the outputs of this script in the example_output folder (and at the 
 
 ## Configuration instructions
 
-There are two config files, style_config.yaml and plot_config.yaml. The location is shown when importing this package.
+There are two config files in the package installation folder, style_config.yaml and plot_config.yaml. 
+The file location is printed out whenever it gets loaded.
 
 ### style_config.yaml
 Contains configuration settings about the plot style, e.g. font sizes and colors. Each key defines a style, which is
