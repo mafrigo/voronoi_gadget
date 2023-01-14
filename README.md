@@ -2,7 +2,7 @@
 Matteo Frigo (Max Planck Institute for Astrophysics, 2016 - 2022)
 
 ![Alt text](example_output/vel4map.png?raw=true "Stellar kinematics example")
-![Alt text](example_output/ZH2map.png?raw=true "Stellar metallicity example")
+![Alt text](example_output/ZH2map.png?raw=true "Stellar metallicity example") ![Alt text](example_output/age2map.png?raw=true "Stellar age example")
 
 ## Description
 Creates mock integral field unit (IFU) galaxy images from galaxy simulations, like the one shown above. 
@@ -31,10 +31,10 @@ import pygad
 import voronoi_gadget as vg
 
 # Load a gadget snapshot file into a snap object with pygad
-snap, = pygad.prepare_zoom(filename)
+snap = vg.openfile(filename)
 
 # Create a Voronoi grid for this snapshot with extent 4 kpc
-grid = vg.VoronoiGrid(snap, 4., npixel_per_side=50, nspaxels=100)
+grid = vg.VoronoiGrid(snap, 4., npixel_per_side=200, nspaxels=500)
 
 # Plot the desired quantity (line of sight velocity) on the grid
 vg.makevoronoimap("vel", grid, cmap='sauron')
@@ -43,7 +43,7 @@ vg.makevoronoimap("vel", grid, cmap='sauron')
 # Plot another quantity (metallicity) on the same grid
 vg.makevoronoimap("ZH", grid, cmap='viridis')
 ```
-The outputs of this script will be saved in vel4map.png and ZH2map.png.
+You can see the outputs of this script in the example_output folder.
 Note that you can also do everything in one step with:
 ```python
 vg.voronoimap(snap, "vel", extent=4., npixel_per_side=50, nspaxels=100)
