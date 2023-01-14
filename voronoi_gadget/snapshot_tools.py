@@ -10,10 +10,13 @@ except ImportError:
     print("Running without pygad")
 
 
-def openfile(snap, force_orient=False, ensure_rotdir=False):
+def openfile(snap, subsnap="stars", force_orient=False, ensure_rotdir=False):
     if type(snap) == str:
         snap, b, c = pygad.prepare_zoom(snap, mode='ssc')
+    if subsnap == "stars":
         snap = snap.stars
+    if subsnap == "gas":
+        snap = snap.gas
     if force_orient:
         snap = orient_snap(snap, axisorientation=1, ensure_rotdir=ensure_rotdir)
     return snap
@@ -35,7 +38,7 @@ def generate_snapshot(N_stars, size=1, velocity_scale=200.):
     return snap
 
 
-def orient_snap(snap, axisorientation=1, rangmom=1., gal_R200=0.1, ensure_rotdir=False):
+def orient_snap(snap, axisorientation=1, gal_R200=0.1, ensure_rotdir=False):
     """
     Orients snap to the principal axes of inertia.
     axisorientation==1: intermediate axis is along the line-of-sight (edge-on orientation).
@@ -46,8 +49,6 @@ def orient_snap(snap, axisorientation=1, rangmom=1., gal_R200=0.1, ensure_rotdir
       momentum
     -The galaxy is also cut at gal_R200 times the virial radius.
     """
-    s, halo, gal = pygad.prepare_zoom(snap, star_form=None, gas_trace=None, mode='ssc',
-                                      to_physical=False)
     if axisorientation == 0:
         return s
     posx = np.copy(s["pos"][:, 0])

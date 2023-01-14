@@ -41,27 +41,49 @@ pip install .
 
 ## Usage example:
 ```python
-import pygad
 import voronoi_gadget as vg
 
-# Load a gadget snapshot file into a snap object with pygad
-snap = vg.openfile(filename)
+# Load a gadget snapshot file into a snap object with pygad (angle=90: edge-on, angle=0: face-on).
+snap = vg.openfile(filename, subsnap="stars", angle=90)
+# Note: for more advanced plots, the snapshot should be opened and oriented with pygad directly.
 
 # Create a Voronoi grid for this snapshot with extent 4 kpc
 grid = vg.VoronoiGrid(snap, 4., npixel_per_side=200, nspaxels=500)
 
-# Plot the desired quantity (line of sight velocity) on the grid
-vg.makevoronoimap("vel", grid, cmap='sauron')
-# Note: coordinate 1 (intermediate axis if oriented edge-on) is used as "line of sight"
+# Plot the desired quantity (line of sight kinematics) on the grid
+grid.plot_qty("vel", cmap='sauron', style="darkblurred")
+# Note: coordinate 1 (intermediate axis if oriented edge-on) is used as line of sight.
 
-# Plot another quantity (metallicity) on the same grid
-vg.makevoronoimap("ZH", grid, cmap='viridis')
-```
-You can see the outputs of this script in the example_output folder.
-Note that you can also do everything in one step with:
-```python
-vg.voronoimap(snap, "vel", extent=4., npixel_per_side=50, nspaxels=100)
-```
+# Plot stellar metallicity on the same grid
+grid.plot_qty("ZH", cmap='viridis', style="darkblurred")
 
-## Output examples:
-See figure above, or figures 4,5,6,10,11 in Frigo et al. 2019 (https://arxiv.org/pdf/1811.11059.pdf).
+# Plot age on the same grid
+grid.plot_qty("age", cmap='Spectral_r', style="darkblurred")
+```
+You can see the outputs of this script in the example_output folder (and at the beginning of this README).
+
+## Configuration instructions
+
+There are two config files, style_config.yaml and plot_config.yaml. The location is shown when importing this package.
+
+###style_config.yaml
+Contains configuration settings about the plot style, e.g. font sizes and colors. Each key defines a style, which is
+used in ```grid.plot_qty()``` (see example above). If an option is not specified for the chosen key, the default option 
+(defined in the "default" key at the end of the file) will be used.
+
+###plot_config.yaml
+Contains configuration settings about labels and colorbar settings for each specific quantity that can get plotted. Like
+in style_config.yaml, unspecified options default to the "default" key.
+
+## Usage in literature:
+* Frigo et al. 2021 (https://ui.adsabs.harvard.edu/abs/2021MNRAS.508.4610F/abstract)
+
+* Neureiter et al. 2021 (https://ui.adsabs.harvard.edu/abs/2021MNRAS.500.1437N/abstract)
+
+* Frigo et al. 2019 (https://ui.adsabs.harvard.edu/abs/2019MNRAS.489.2702F/abstract)
+
+* Rantala et al. 2019 (https://ui.adsabs.harvard.edu/abs/2019ApJ...872L..17R/abstract)
+
+* Rantala et al. 2018 (https://ui.adsabs.harvard.edu/abs/2018ApJ...864..113R/abstract)
+
+* Lahén et al. 2018 (https://ui.adsabs.harvard.edu/abs/2018MNRAS.475.3934L/abstract)
