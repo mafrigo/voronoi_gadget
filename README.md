@@ -66,12 +66,12 @@ You can see the outputs of this script in the example_output folder (and at the 
 
 There are two config files, style_config.yaml and plot_config.yaml. The location is shown when importing this package.
 
-###style_config.yaml
+### style_config.yaml
 Contains configuration settings about the plot style, e.g. font sizes and colors. Each key defines a style, which is
 used in ```grid.plot_qty()``` (see example above). If an option is not specified for the chosen key, the default option 
 (defined in the "default" key at the end of the file) will be used.
 
-###plot_config.yaml
+### plot_config.yaml
 Contains configuration settings about labels and colorbar settings for each specific quantity that can get plotted. Like
 in style_config.yaml, unspecified options default to the "default" key.
 
