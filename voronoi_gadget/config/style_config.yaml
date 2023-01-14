@@ -1,8 +1,8 @@
 dark:
-  background_color: darkslategrey
+  background_color: "#363737"
   text_color: white
 darkblurred:
-  background_color: darkslategrey
+  background_color: "#363737"
   text_color: white
   interpolation: bicubic
 default:

@@ -192,87 +192,88 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
         img = display_bins(grid.xvor, grid.yvor, grid.binNum, plotquantity[:, i], vmin=cmaplimits[i][0],
                            vmax=cmaplimits[i][1], cmap=cmap, interpolation=cfg["interpolation"], **kwargs)
 
-        ax = plt.gca()
-        if cutatmag is None:
-            # Plotting titles
-            plt.title(titles[i], fontsize=cfg["titlesize"], y=1.04, color=cfg["text_color"])
-
-            # Flux contours
-            if fluxcontours is not None:
-                try:
-                    mag = -2.5 * np.log10(flux / np.max(flux).ravel())
-                    plt.tricontour(xflux, yflux, mag,
-                                   levels=np.arange(5), colors='k',  # 20
-                                   linewidths=cfg["contourthickness"])
-                except:
-                    print("Warning: Impossible to print contours; problem with the data")
-                    print(xflux, yflux, flux)
-
-            # Adjusting axes ticks
-            ax.tick_params(labelsize=cfg["digitsize"], labelcolor=cfg["text_color"])
-            ax.tick_params(direction="in", which='both')
-            # locs= ax.get_yticks()
-            locs = np.round(np.linspace(-0.5 * grid.extent, 0.5 * grid.extent, cfg["naxeslabels"]), 2)
-            ax.xaxis.set_ticks(locs)
-            ax.yaxis.set_ticks(locs)
-            plt.xlim([-0.5 * grid.extent, 0.5 * grid.extent])
-            plt.ylim([-0.5 * grid.extent, 0.5 * grid.extent])
-
-            # Determining and plotting colorbar ticks
-            divider = mplax.make_axes_locatable(ax)
-            cax = divider.append_axes("right", size="5%", pad=0.05)
-            if cfg["ncbarlabels"] is None:
-                cb = plt.colorbar(img, cax=cax)
-                cb.ax.tick_params(labelsize=cfg["digitsize"], color=cfg["text_color"], labelcolor=cfg["text_color"])
-            else:  # Calculating optimal colormap tick distribution
-                cspan = (cmaplimits[i][1] - cmaplimits[i][0]) / (cfg["ncbarlabels"] - 1)
-                # cspan: separation between colorbar ticks/labels
-                cspanorder = int(np.round(np.log10(cspan)))
-                # recalculating cspan in case lower limit needs to be truncated
-                if cmaplimits[i][1] != -cmaplimits[i][0]:
-                    if cmaplimits[i][0] == 0.:
-                        cmaplimits[i][0] = np.min(plotquantity[:, i])
-                    # limitorder=int(np.floor(np.log10(abs(cmaplimits[i][0]))))
-                    limitorder = int(np.floor(np.log10(abs(cmaplimits[i][1]))))
-                    lowerlimit = (10. ** (limitorder - 1)) * np.ceil(cmaplimits[i][0] / (10. ** (limitorder - 1)))
-                    cspan = (cmaplimits[i][1] - lowerlimit) / (cfg["ncbarlabels"] - 1)
-                    # truncating cspan to avoid lots of decimals
-                cspan = (10. ** (cspanorder - 1)) * np.trunc(cspan / (10. ** (cspanorder - 1)))
-                if cspanorder > 0:
-                    cspan = int(cspan)
-                if cmaplimits[i][1] == -cmaplimits[i][0]:
-                    cticks = []
-                    for itick in np.arange(cfg["ncbarlabels"]):
-                        cticks.append(cspan * (itick - ((cfg["ncbarlabels"] - 1) / 2.)))
-                else:
-                    cticks = []
-                    for itick in np.arange(cfg["ncbarlabels"]):
-                        cticks.append(lowerlimit + cspan * (itick))
-                print("Colorbar ticks (" + str(i) + "): " + str(cticks))
-                cb = plt.colorbar(img, cax=cax, ticks=cticks)
-                cb.ax.tick_params(labelsize=cfg["digitsize"] * 1.1, color=cfg["text_color"], labelcolor=cfg["text_color"])
-
-        plt.subplots_adjust(wspace=0.3)
-        fig.patch.set_facecolor(cfg["background_color"])
-
-    if savefigure:
         if cutatmag is not None:  # Figure cut at a given isophote, without axes
+            continue
+
+        ax = plt.gca()
+        # Plotting titles
+        plt.title(titles[i], fontsize=cfg["titlesize"], y=1.04, color=cfg["text_color"])
+
+        # Flux contours
+        if fluxcontours is not None:
+            try:
+                mag = -2.5 * np.log10(flux / np.max(flux).ravel())
+                plt.tricontour(xflux, yflux, mag,
+                               levels=np.arange(5), colors='k',  # 20
+                               linewidths=cfg["contourthickness"])
+            except:
+                print("Warning: Impossible to print contours; problem with the data")
+                print(xflux, yflux, flux)
+
+        # Adjusting axes ticks
+        ax.tick_params(labelsize=cfg["digitsize"], labelcolor=cfg["text_color"])
+        ax.tick_params(direction="in", which='both')
+        # locs= ax.get_yticks()
+        locs = np.round(np.linspace(-0.5 * grid.extent, 0.5 * grid.extent, cfg["naxeslabels"]), 2)
+        ax.xaxis.set_ticks(locs)
+        ax.yaxis.set_ticks(locs)
+        plt.xlim([-0.5 * grid.extent, 0.5 * grid.extent])
+        plt.ylim([-0.5 * grid.extent, 0.5 * grid.extent])
+
+        # Determining and plotting colorbar ticks
+        divider = mplax.make_axes_locatable(ax)
+        cax = divider.append_axes("right", size="5%", pad=0.05)
+        if cfg["ncbarlabels"] is None:
+            cb = plt.colorbar(img, cax=cax)
+            cb.ax.tick_params(labelsize=cfg["digitsize"], color=cfg["text_color"], labelcolor=cfg["text_color"])
+        else:  # Calculating optimal colormap tick distribution
+            cspan = (cmaplimits[i][1] - cmaplimits[i][0]) / (cfg["ncbarlabels"] - 1)
+            # cspan: separation between colorbar ticks/labels
+            cspanorder = int(np.round(np.log10(cspan)))
+            # recalculating cspan in case lower limit needs to be truncated
+            if cmaplimits[i][1] != -cmaplimits[i][0]:
+                if cmaplimits[i][0] == 0.:
+                    cmaplimits[i][0] = np.min(plotquantity[:, i])
+                # limitorder=int(np.floor(np.log10(abs(cmaplimits[i][0]))))
+                limitorder = int(np.floor(np.log10(abs(cmaplimits[i][1]))))
+                lowerlimit = (10. ** (limitorder - 1)) * np.ceil(cmaplimits[i][0] / (10. ** (limitorder - 1)))
+                cspan = (cmaplimits[i][1] - lowerlimit) / (cfg["ncbarlabels"] - 1)
+                # truncating cspan to avoid lots of decimals
+            cspan = (10. ** (cspanorder - 1)) * np.trunc(cspan / (10. ** (cspanorder - 1)))
+            if cspanorder > 0:
+                cspan = int(cspan)
+            if cmaplimits[i][1] == -cmaplimits[i][0]:
+                cticks = []
+                for itick in np.arange(cfg["ncbarlabels"]):
+                    cticks.append(cspan * (itick - ((cfg["ncbarlabels"] - 1) / 2.)))
+            else:
+                cticks = []
+                for itick in np.arange(cfg["ncbarlabels"]):
+                    cticks.append(lowerlimit + cspan * (itick))
+            print("Colorbar ticks (" + str(i) + "): " + str(cticks))
+            cb = plt.colorbar(img, cax=cax, ticks=cticks)
+            cb.ax.tick_params(labelsize=cfg["digitsize"] * 1.1, color=cfg["text_color"], labelcolor=cfg["text_color"])
+
+    plt.subplots_adjust(wspace=0.3)
+    fig.patch.set_facecolor(cfg["background_color"])
+    if savefigure:
+        if cutatmag is None:
+            print("Saving figure in " + plotfile + ".png")
+            plt.savefig(plotfile, bbox_inches='tight')
+        else: # Figure cut at a given isophote, without axes
             plt.axis('off')
             # plt.tight_layout()
             plt.subplots_adjust(wspace=0.01)
             print("Saving cut figure in " + plotfile + ".png")
             plt.savefig(plotfile, bbox_inches='tight', transparent=True)
             return
-        else:
-            print("Saving figure in " + plotfile + ".png")
-            plt.savefig(plotfile, bbox_inches='tight')
     plt.pause(0.01)
-
     if savetxt is not None:
         np.savetxt(savetxt + '.kin', np.transpose(np.array([plotquantity[:, 0], plotquantity[:, 1],
                                                             plotquantity[:, 2], plotquantity[:, 3],
                                                             fluxvoro, grid.xBar, grid.yBar])))
         np.savetxt(savetxt + '.grid', np.transpose(np.array([grid.xvor, grid.yvor, grid.binNum])))
+    return
 
 
 def deduce_cbar_limits(plotquantity, cmaplimits):

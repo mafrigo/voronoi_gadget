@@ -22,7 +22,7 @@ def generate_snapshot(N_stars, size=1, velocity_scale=200.):
     snap["pos"] = np.random.choice([-1., 1.], (N_stars, 3)) * np.random.exponential(size, (N_stars, 3))
     snap["vel"] = np.full((N_stars, 3), velocity_scale) + np.random.normal(0., 2.*velocity_scale, (N_stars, 3))
     snap["vel"][:, 2] *= np.sign(snap["pos"][:, 1])
-    snap["vel"][:, 1] *= np.sign(snap["pos"][:, 0])
+    snap["vel"][:, 1] *= np.sign(snap["pos"][:, 2])
     snap["vel"][:, 0] *= np.sign(snap["pos"][:, 2])
     snap["pos"] += np.random.normal(0., 0.5*size, (N_stars, 3))
     print(np.min(abs(snap["pos"])), np.max(abs(snap["pos"])))
