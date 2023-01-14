@@ -67,13 +67,13 @@ class TestMapping(unittest.TestCase):
 
 class TestEndToEnd(unittest.TestCase):
     def test_e2e(self):
-        test_output_image = "vel4map_test.png"
-        if os.path.exists(test_output_image):
-            os.remove(test_output_image)
+        test_output_image = "vel4map_test"
+        if os.path.exists(test_output_image+".png"):
+            os.remove(test_output_image+".png")
         snap = generate_snapshot(100000)
         voronoimap(snap, "vel", extent=4., scalebar=1., force_orient=False, npixel_per_side=50, nspaxels=100,
                    plotfile=test_output_image, style='darkblurred')
-        self.assertEqual(os.path.exists(test_output_image), True)
+        self.assertEqual(os.path.exists(test_output_image+".png"), True)
 
 
 if __name__ == '__main__':

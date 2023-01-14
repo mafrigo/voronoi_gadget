@@ -86,3 +86,4 @@ def voronoimap(snap, qty='vel', grid=None, extent=20, npixel_per_side=200, partp
                    cutatmag=cutatmag, addlambdar=addlambdar, savetxt=savetxt, scalebar=scalebar, style=style)
     if savefigure:
         plt.close()
+    return grid
