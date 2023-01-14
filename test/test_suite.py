@@ -71,8 +71,8 @@ class TestEndToEnd(unittest.TestCase):
         if os.path.exists(test_output_image+".png"):
             os.remove(test_output_image+".png")
         snap = generate_snapshot(100000)
-        voronoimap(snap, "vel", extent=4., scalebar=1., force_orient=False, npixel_per_side=50, nspaxels=100,
-                   plotfile=test_output_image, style='darkblurred')
+        grid = VoronoiGrid(snap, extent=4., npixel_per_side=50, nspaxels=100)
+        grid.plot_qty("vel", scalebar=1., plotfile=test_output_image, style='darkblurred')
         self.assertEqual(os.path.exists(test_output_image+".png"), True)
 
 

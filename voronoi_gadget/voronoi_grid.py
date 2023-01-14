@@ -1,5 +1,7 @@
 import numpy as np
 from voronoi_gadget.los_statistics import *
+from voronoi_gadget.plot_maker import makevoronoimap
+from voronoi_gadget.defaults import get_plot_config
 
 
 class VoronoiGrid(object):
@@ -116,6 +118,23 @@ class VoronoiGrid(object):
             stats[:, 0] = stats[:, 0] - np.mean(stats[:, 0][self.xBar ** 2 + self.yBar ** 2 < 1.])
         return stats
 
+    def plot_qty(self, qty, weightqty="mass", style="default", plotfile=None, figureconfig='horizontal', scalebar=None,
+                 info=None, cutatmag=None, savetxt=None):
+        # Loading default parameters
+        titles, cmap, cmaplimits, statsmode, addlambdar, centeriszero = get_plot_config(qty)
+        if statsmode == "fit":
+            npanels = 4
+        else:
+            npanels = 2
+        if plotfile is None:
+            plotfile = qty + str(npanels) + 'map'
+        # Calculate statistics of each Voronoi bin
+        stats = self.get_stats(qty, weightqty=weightqty, mode=statsmode, centeriszero=centeriszero)
+        # Plot maps
+        makevoronoimap(stats, self, npanels=npanels, fluxqty=weightqty, figureconfig=figureconfig, cmap=cmap,
+                       cmaplimits=cmaplimits, titles=titles, titles2=info, plotfile=plotfile,
+                       cutatmag=cutatmag, addlambdar=addlambdar, savetxt=savetxt, scalebar=scalebar, style=style)
+
 
 def _makegrid(posx, posy, weights, extent,
               npixel_per_side=200, partperbin=None, nvoronoibins=500):
@@ -165,6 +184,3 @@ def _makegrid(posx, posy, weights, extent,
     spaxelofpart[gridcondition] = binNum[pixelofpart]
 
     return spaxelofpart, xvor, yvor, xBar, yBar, binNum
-
-
-
