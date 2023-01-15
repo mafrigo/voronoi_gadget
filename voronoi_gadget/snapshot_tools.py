@@ -1,4 +1,4 @@
-__all__ = ["generate_snapshot", "PseudoSnap", "orient_snap", "openfile"]
+__all__ = ["generate_snapshot", "PseudoSnap", "orient_snap", "openfile", "rotate"]
 
 import numpy as np
 try:
@@ -10,15 +10,15 @@ except ImportError:
     print("Running without pygad")
 
 
-def openfile(snap, subsnap="stars", force_orient=False, ensure_rotdir=False):
+def openfile(snap, subsnap="stars", force_orient=False, ensure_rotdir=False, angle=0.):
     if type(snap) == str:
-        snap, b, c = pygad.prepare_zoom(snap, mode='ssc')
+        a, b, snap = pygad.prepare_zoom(snap, mode='ssc') # Opens simulation, centers on stellar component, cuts at 0.1*virial radius
     if subsnap == "stars":
         snap = snap.stars
     if subsnap == "gas":
         snap = snap.gas
     if force_orient:
-        snap = orient_snap(snap, axisorientation=1, ensure_rotdir=ensure_rotdir)
+        snap = orient_snap(snap, ensure_rotdir=ensure_rotdir, inclination=angle)
     return snap
 
 
@@ -38,56 +38,52 @@ def generate_snapshot(N_stars, size=1, velocity_scale=200.):
     return snap
 
 
-def orient_snap(snap, axisorientation=1, gal_R200=0.1, ensure_rotdir=False):
+def rotate(qty, inclination, z_rotation):
     """
-    Orients snap to the principal axes of inertia.
-    axisorientation==1: intermediate axis is along the line-of-sight (edge-on orientation).
-    axisorientation==2: major axis is along the line-of-sight.
-    axisorientation==3: minor axis is along the line-of-sight (face-on orientation).
+    Rotate given vector (qty) according to given angles (inclination and rotation around z-axis)
+    """
+    inc = inclination * np.pi / 180.
+    phi = z_rotation * np.pi / 180.
+    qtyx = qty[0] * np.cos(phi) - qty[1] * np.sin(phi)
+    qtyy = (qty[0] * np.sin(phi) + qty[1] * np.cos(phi)) * np.cos(inc) - qty[2] * np.sin(inc)
+    qtyz = (qty[0] * np.sin(phi) + qty[1] * np.cos(phi)) * np.sin(inc) + qty[2] * np.cos(inc)
+    return [qtyx, qtyy, qtyz]
 
-    -rangmom is the radius used to estimate the direction of the angular
-      momentum
-    -The galaxy is also cut at gal_R200 times the virial radius.
+
+def orient_snap(snap, inclination=0., z_rotation=0., ensure_rotdir=False, include_extra_qtys=[]):
     """
-    if axisorientation == 0:
-        return s
-    posx = np.copy(s["pos"][:, 0])
-    posy = np.copy(s["pos"][:, 1])
-    posz = np.copy(s["pos"][:, 2])
-    velx = np.copy(s["vel"][:, 0])
-    vely = np.copy(s["vel"][:, 1])
-    velz = np.copy(s["vel"][:, 2])
-    if axisorientation == 1:
-        s["pos"][:, 2] = posy
-        s["pos"][:, 1] = posx
-        s["pos"][:, 0] = posz
-        s["vel"][:, 2] = vely
-        s["vel"][:, 1] = velx
-        s["vel"][:, 0] = velz
-    elif axisorientation == 2:
-        s["pos"][:, 2] = posx
-        s["pos"][:, 0] = posz
-        s["vel"][:, 2] = velx
-        s["vel"][:, 0] = velz
-    elif axisorientation == 3:
-        s["pos"][:, 0] = posy
-        s["pos"][:, 1] = posx
-        s["vel"][:, 0] = vely
-        s["vel"][:, 1] = velx
-    else:
-        raise IOError("axisorientation must be 0, 1, 2 or 3")
-    # Orient galaxy so that the angular momentum vector has
-    # a consistent direction:
-    R200, M200 = pygad.analysis.virial_info(s)
-    s = s[pygad.BallMask(gal_R200 * R200)]
+    Orients snap to the principal axes of inertia (coordinate 0 = major axis, coordinate 1 = intermediate axis,
+    coordinate 2 = minor axis).
+    If inclination and or z_rotation are given, rotates the galaxy by those angles; inclination is the rotation around
+    the major axis, while z_rotation around the minor axis.
+    If ensure_rotdir is true, the galaxy will always have the angular momantum vector pointing down.
+    """
+    snap["vg_inclination"] = inclination
+    snap["vg_z_rotation"] = z_rotation
+
+    if inclination != 0. or z_rotation != 0.:
+        posx = np.copy(snap["pos"][:, 0])
+        posy = np.copy(snap["pos"][:, 1])
+        posz = np.copy(snap["pos"][:, 2])
+        velx = np.copy(snap["vel"][:, 0])
+        vely = np.copy(snap["vel"][:, 1])
+        velz = np.copy(snap["vel"][:, 2])
+        newpos = rotate([posx,posy,posz], inclination, z_rotation)
+        snap["pos"][:, 0] = newpos[0]
+        snap["pos"][:, 1] = newpos[1]
+        snap["pos"][:, 2] = newpos[2]
+        newvel = rotate([velx,vely,velz], inclination, z_rotation)
+        snap["vel"][:, 0] = newvel[0]
+        snap["vel"][:, 1] = newvel[1]
+        snap["vel"][:, 2] = newvel[2]
 
     if ensure_rotdir:
         # ensures that the angular momentum vector is always pointing in the same direction
-        rangmom = 5.
+        rangmom = 2.
         angmomy = snap["mass"] * (snap["vel"][:, 2] * snap["pos"][:, 1] - snap["vel"][:, 1] * snap["pos"][:, 2])
         if np.mean(angmomy[snap["pos"][:, 0] ** 2 + snap["pos"][:, 1] ** 2 < rangmom ** 2]) > 0:
             snap["pos"] = -snap["pos"]
-    return s
+    return snap
 
 
 class PseudoSnap(object):

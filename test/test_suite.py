@@ -26,6 +26,12 @@ class TestSnapshot(unittest.TestCase):
         self.assertEqual(pseudosnap["pos"].shape, (test_snap_len_pp*n_pseudo_particles, 3))
         self.assertEqual(pseudosnap["vel"].shape, (test_snap_len_pp*n_pseudo_particles, 3))
 
+    def test_rotation(self):
+        initial_vector = [1., 2., 3.]
+        end_vector = rotate(initial_vector, 90., 90.)
+        end_vector = [np.round(value) for value in end_vector]
+        self.assertEqual(end_vector, [-2., -3., 1.])
+
 
 class TestVoronoiTessellation(unittest.TestCase):
     def test_grid_nspaxel(self):
