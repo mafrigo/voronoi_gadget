@@ -1,5 +1,4 @@
 # voronoi_gadget
-Matteo Frigo (Max Planck Institute for Astrophysics, 2016 - 2022)
 <table>
   <tr>
     <td colspan="2">Stellar kinematics example</td>
