@@ -11,7 +11,6 @@ with the sum of two Gaussians.
 __all__ = ["gauss_hermite_func", "normalized_gauss_hermite_func", "gauss_hermite_fit"]
 
 import numpy as np
-import pygad
 import scipy.integrate
 import scipy.optimize as opt
 import scipy.special

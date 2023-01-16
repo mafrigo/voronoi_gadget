@@ -2,8 +2,7 @@ __all__ = ["generate_snapshot", "PseudoSnap", "orient_snap", "openfile", "rotate
 
 import numpy as np
 try:
-    import pygad
-    # import pygadmpa as mpa
+    import pygadmpa as pygad
     no_pygad = False
 except ImportError:
     no_pygad = True
@@ -167,7 +166,6 @@ class PseudoSnap(object):
         """
         if no_pygad:
             raise IOError("Subsnapshots of a PseudoSnap only work with pygad")
-        import pygad
         if name in pygad.gadget.families:
             fam_snap = pygad.snapshot.FamilySubSnap(self.snap, name)
             fam_pseudosnap = PseudoSnap(fam_snap, self.npp, self.sigma)
