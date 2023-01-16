@@ -2,7 +2,7 @@ __all__ = ["generate_snapshot", "PseudoSnap", "orient_snap", "openfile", "rotate
 
 import numpy as np
 try:
-    import pygadmpa as pygad
+    import pygad
     no_pygad = False
 except ImportError:
     no_pygad = True

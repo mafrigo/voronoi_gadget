@@ -181,7 +181,7 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
                     print("Warning: Scalebar format not accepted")
 
             if addlambdar and cutatmag is None:
-                import pygadmpa as pygad
+                import pygad
                 reff = pygad.analysis.half_mass_radius(grid._snap, proj=1)
                 print("Effective radius: " + str(reff))
                 lambdaR = _lambdar(grid, plotquantity, rmax=reff)[-1]

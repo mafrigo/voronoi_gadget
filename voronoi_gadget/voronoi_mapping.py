@@ -67,7 +67,7 @@ def voronoimap(snap, qty='vel', grid=None, extent=20, npixel_per_side=200, partp
     # Loading and preparing snapshot
     snap = openfile(snap, force_orient=force_orient, ensure_rotdir=ensure_rotdir)
     if scalebar == 'reff':
-        import pygadmpa as pygad
+        import pygad
         scalebar = pygad.analysis.half_mass_radius(snap, proj=1)
     if sigmapp > 0.:
         snap = PseudoSnap(snap, npseudoparticles, sigmapp, qty_spread)
