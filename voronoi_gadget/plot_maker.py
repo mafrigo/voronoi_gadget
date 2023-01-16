@@ -81,7 +81,7 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
     if fluxcontours == 'regular' or fluxcontours == 'smooth':
         print("Calculating flux in each pixel for plotting contours")
         flux, xedges, yedges, pixelofpart0 = scipy.stats.binned_statistic_2d(
-            x=grid._snap["pos"][:, 0], y=grid._snap["pos"][:, 1], values=grid._snap[fluxqty],
+            x=grid._snap["pos"][:, 0], y=grid._snap["pos"][:, 2], values=grid._snap[fluxqty],
             statistic='sum', bins=grid.npixel_per_side,
             range=[[-grid.extent / 2., grid.extent / 2.], [-grid.extent / 2., grid.extent / 2.]])
         if fluxcontours == 'smooth':
@@ -182,7 +182,7 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
                     print("Warning: Scalebar format not accepted")
 
             if addlambdar and cutatmag is None:
-                reff = pygad.analysis.half_mass_radius(grid._snap, proj=2)
+                reff = pygad.analysis.half_mass_radius(grid._snap, proj=1)
                 print("Effective radius: " + str(reff))
                 lambdaR = _lambdar(grid, plotquantity, rmax=reff)[-1]
                 plt.text(minx + 0.6 * xlength, miny + 0.03 * ylength, r"$\lambda_R = %.2f$" % (lambdaR),
@@ -201,14 +201,14 @@ def makevoronoimap(plotquantity, grid, npanels=4, fluxcontours='smooth',
 
         # Flux contours
         if fluxcontours is not None:
-            try:
+            #try:
                 mag = -2.5 * np.log10(flux / np.max(flux).ravel())
-                plt.tricontour(xflux, yflux, mag,
+                plt.tricontour(yflux, xflux, mag,
                                levels=np.arange(5), colors='k',  # 20
                                linewidths=cfg["contourthickness"])
-            except:
-                print("Warning: Impossible to print contours; problem with the data")
-                print(xflux, yflux, flux)
+            #except:
+            #    print("Warning: Impossible to print contours; problem with the data")
+            #    print(xflux, yflux, flux)
 
         # Adjusting axes ticks
         ax.tick_params(labelsize=cfg["digitsize"], labelcolor=cfg["text_color"])
@@ -332,7 +332,8 @@ def display_bins(x, y, binNum, qtyBin, ax=None, cmap='Sauron', plotextent_fac=1.
     mask[j, k] = 0
     img[j, k] = val
     img = np.ma.masked_array(img, mask)
-    img = ax.imshow(np.rot90(img), interpolation=interpolation, cmap=cmap,
+    #img = np.rot90(img)
+    img = ax.imshow(img, interpolation=interpolation, cmap=cmap,
                     extent=[plotextent_fac * (xmin - pixelsize / 2), plotextent_fac * (xmax + pixelsize / 2),
                             plotextent_fac * (ymin - pixelsize / 2), plotextent_fac * (ymax + pixelsize / 2)],
                     **kwargs)

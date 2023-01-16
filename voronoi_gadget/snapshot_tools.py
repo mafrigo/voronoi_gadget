@@ -27,12 +27,15 @@ def generate_snapshot(N_stars, size=1, velocity_scale=200.):
     np.random.seed(1)
     snap["ID"] = np.arange(N_stars)
     snap["mass"] = np.full(N_stars, 1.)
-    snap["pos"] = np.random.choice([-1., 1.], (N_stars, 3)) * np.random.exponential(size, (N_stars, 3))
-    snap["vel"] = np.full((N_stars, 3), velocity_scale) + np.random.normal(0., 2.*velocity_scale, (N_stars, 3))
-    snap["vel"][:, 2] *= np.sign(snap["pos"][:, 1])
-    snap["vel"][:, 1] *= np.sign(snap["pos"][:, 2])
-    snap["vel"][:, 0] *= np.sign(snap["pos"][:, 2])
-    snap["pos"] += np.random.normal(0., 0.5*size, (N_stars, 3))
+    snap["pos"] = np.random.choice([-1., 1.], (N_stars, 3)) * np.random.exponential(size, (N_stars, 3)) # spherical system
+    snap["pos"][:, 1] /= 1.2 # intermediate axis should be slightly smaller
+    snap["pos"][:, 2] /= 3. # minor axis much smaller -> make system flattened
+    snap["vel"] = np.full((N_stars, 3), 0.1)
+    vel = np.random.normal(2.*velocity_scale, 0.1*velocity_scale, N_stars)
+    rad = np.sqrt(snap["pos"][:, 0]**2 + snap["pos"][:, 1]**2)
+    snap["vel"][:, 0] = - vel * (snap["pos"][:, 1]/rad)
+    snap["vel"][:, 1] = vel * (snap["pos"][:, 0]/rad) # velocity oriented tangentially to position
+    snap["pos"] += np.random.normal(0., 0.5 * size, (N_stars, 3)) # extra randomness
     print(np.min(abs(snap["pos"])), np.max(abs(snap["pos"])))
     print(np.min(snap["vel"]), np.min(abs(snap["vel"])), np.max(abs(snap["vel"])))
     return snap
