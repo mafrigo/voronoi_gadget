@@ -17,7 +17,6 @@
   </tr>
  </table>
 
-## Description
 Creates mock integral field unit (IFU) galaxy images from galaxy simulations, like the one shown above. 
 Each Voronoi bin (spaxel) contains roughly the same number of simulation particles in projection. 
 This simulates the signal-to-noise criterion used in real IFU maps to determine the bin shape and size.
