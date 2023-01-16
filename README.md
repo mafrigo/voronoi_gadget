@@ -41,8 +41,8 @@ pip install .
 ```python
 import voronoi_gadget as vg
 
-# Load a gadget snapshot file into a snap object with pygad (angle=90: edge-on, angle=0: face-on).
-snap = vg.openfile(filename, subsnap="stars", angle=90)
+# Load a gadget snapshot file into a snap object with pygad (angle=0: edge-on, angle=90: face-on).
+snap = vg.openfile(filename, subsnap="stars", angle=0.)
 # Note: for more advanced plots, the snapshot should be opened and oriented with pygad directly.
 
 # Create a Voronoi grid for this snapshot with extent 4 kpc
